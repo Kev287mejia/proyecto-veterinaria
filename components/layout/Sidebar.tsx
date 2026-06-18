@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen = false, setIsOpen = (val: boolean) => {} }: { isOpen?: boolean, setIsOpen?: (val: boolean) => void }) {
   const pathname = usePathname();
   const supabase = createClient();
   const [userRole, setUserRole] = useState<'ADMIN' | 'VETERINARIO' | 'CLIENTE'>('CLIENTE');
@@ -32,6 +32,11 @@ export default function Sidebar() {
     loadUserRole();
   }, []);
 
+  useEffect(() => {
+    // Cierra el sidebar en móviles cuando cambia la ruta
+    setIsOpen(false);
+  }, [pathname, setIsOpen]);
+
   const isActive = (path: string) => {
     if (path === '/') {
       return pathname === '/';
@@ -48,7 +53,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="h-screen w-64 fixed left-0 top-0 border-r border-outline-variant bg-surface flex flex-col p-4 gap-2 z-50">
+    <aside className={`h-screen w-64 fixed left-0 top-0 border-r border-outline-variant bg-surface flex flex-col p-4 gap-2 z-50 transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
       <div className="flex items-center gap-3 px-2 mb-8 mt-2">
         <img alt="Vetsync Logo" className="w-8 h-8 object-contain" src="/Vetsync_Logo.png" />
         <div className="flex flex-col">

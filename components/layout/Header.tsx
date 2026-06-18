@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 
-export default function Header() {
+export default function Header({ onOpenSidebar = () => {} }: { onOpenSidebar?: () => void }) {
   const supabase = createClient();
   const router = useRouter();
   const [displayName, setDisplayName] = useState('');
@@ -54,8 +54,14 @@ export default function Header() {
 
   return (
     <header className="h-16 flex items-center justify-between px-6 bg-surface border-b border-outline-variant sticky top-0 z-40">
-      {/* Barra de búsqueda */}
-      <div className="flex-1">
+      {/* Barra de búsqueda y Menú Hamburguesa */}
+      <div className="flex-1 flex items-center gap-3">
+        <button 
+          onClick={onOpenSidebar}
+          className="md:hidden p-2 -ml-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors"
+        >
+          <span className="material-symbols-outlined">menu</span>
+        </button>
         <div className="relative w-full max-w-md hidden md:block">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
           <input
