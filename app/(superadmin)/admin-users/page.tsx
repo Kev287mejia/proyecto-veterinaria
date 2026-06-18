@@ -8,6 +8,14 @@ export default function AdminUsers() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Edit states
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<any>(null);
+  const [editFormData, setEditFormData] = useState({
+    full_name: '',
+    phone: ''
+  });
   
   useEffect(() => {
     fetchUsers();
@@ -61,6 +69,35 @@ export default function AdminUsers() {
     } catch (error: any) {
       console.error("Error deleting user:", error);
       alert("No se pudo eliminar el usuario. Si tiene mascotas, citas o clínicas asociadas, deberás eliminarlas primero para mantener la integridad de la base de datos.");
+    }
+  };
+
+  const handleEditUserSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingUser) return;
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: editFormData.full_name,
+          phone: editFormData.phone || null
+        })
+        .eq('id', editingUser.id);
+
+      if (error) throw error;
+
+      setUsers(users.map(u => u.id === editingUser.id ? { 
+        ...u, 
+        full_name: editFormData.full_name,
+        phone: editFormData.phone || null
+      } : u));
+      
+      setIsEditModalOpen(false);
+      alert("Usuario actualizado con éxito.");
+    } catch (error: any) {
+      console.error("Error updating user data:", error);
+      alert("Error al actualizar los datos: " + error.message);
     }
   };
 
@@ -140,7 +177,7 @@ export default function AdminUsers() {
                     </span>
                   </td>
                   <td className="p-4">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <select
                         value={u.role}
                         onChange={(e) => handleRoleChange(u.id, e.target.value)}
@@ -150,6 +187,22 @@ export default function AdminUsers() {
                         <option value="vet">Veterinario/Clínica (Vet)</option>
                         <option value="admin">Super Admin (Admin)</option>
                       </select>
+                      
+                      <button
+                        onClick={() => {
+                          setEditingUser(u);
+                          setEditFormData({
+                            full_name: u.full_name || '',
+                            phone: u.phone || ''
+                          });
+                          setIsEditModalOpen(true);
+                        }}
+                        className="w-9 h-9 rounded-xl hover:bg-primary/10 text-on-surface-variant hover:text-primary flex items-center justify-center transition-all border border-transparent hover:border-primary/20"
+                        title="Editar Datos"
+                      >
+                        <span className="material-symbols-outlined text-[20px]">edit</span>
+                      </button>
+
                       <button
                         onClick={() => handleDeleteUser(u.id, u.full_name)}
                         className="w-9 h-9 rounded-xl hover:bg-error-container text-on-surface-variant hover:text-error flex items-center justify-center transition-all border border-transparent hover:border-error/20"
@@ -172,6 +225,62 @@ export default function AdminUsers() {
           </table>
         </div>
       </div>
+
+      {/* Edit User Modal */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 animate-in fade-in duration-200">
+          <div className="bg-surface-container-lowest rounded-3xl p-8 w-full max-w-lg shadow-2xl animate-in zoom-in-95 duration-200 border border-outline-variant">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-on-surface">Editar Datos del Usuario</h2>
+              <button onClick={() => setIsEditModalOpen(false)} className="text-on-surface-variant hover:bg-surface-container rounded-full p-1 transition-colors">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <form onSubmit={handleEditUserSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-on-surface-variant ml-1">Nombre Completo *</label>
+                <input
+                  required
+                  type="text"
+                  value={editFormData.full_name}
+                  onChange={(e) => setEditFormData({...editFormData, full_name: e.target.value})}
+                  className="w-full bg-surface-container-low border border-outline-variant text-on-surface rounded-2xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  placeholder="Ej. Juan Pérez"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-on-surface-variant ml-1">Teléfono</label>
+                <input
+                  type="text"
+                  value={editFormData.phone}
+                  onChange={(e) => setEditFormData({...editFormData, phone: e.target.value})}
+                  className="w-full bg-surface-container-low border border-outline-variant text-on-surface rounded-2xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  placeholder="Ej. +34 600 000 000"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="flex-1 bg-surface-container hover:bg-surface-container-high text-on-surface font-bold py-3.5 rounded-2xl transition-all"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 bg-primary hover:bg-primary/90 text-on-primary font-bold py-3.5 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2"
+                >
+                  <span className="material-symbols-outlined">save</span>
+                  Guardar Cambios
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
