@@ -1,8 +1,58 @@
+"use client";
+
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { createClient } from '@/utils/supabase/client';
+import { useRouter } from 'next/navigation';
 
 export default function Header() {
+  const supabase = createClient();
+  const router = useRouter();
+  const [displayName, setDisplayName] = useState('');
+  const [roleLabel, setRoleLabel] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    async function loadUser() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name, role')
+        .eq('id', user.id)
+        .single();
+
+      // Nombre con fallback robusto
+      const rawName =
+        (profile?.full_name && profile.full_name.trim()) ||
+        (user.user_metadata?.full_name && String(user.user_metadata.full_name).trim()) ||
+        null;
+
+      const name = rawName
+        ? rawName
+        : user.email
+          ? user.email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+          : 'Usuario';
+
+      setDisplayName(name);
+      setRoleLabel(profile?.role === 'vet' ? 'Veterinario' : 'Dueño de Mascota');
+
+      // Avatar: iniciales como fallback visual via pravatar basado en email
+      setAvatarUrl(`https://i.pravatar.cc/150?u=${user.email}`);
+    }
+    loadUser();
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/login');
+  };
+
   return (
     <header className="h-16 flex items-center justify-between px-6 bg-surface border-b border-outline-variant sticky top-0 z-40">
+      {/* Barra de búsqueda */}
       <div className="flex-1">
         <div className="relative w-full max-w-md hidden md:block">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
@@ -13,23 +63,72 @@ export default function Header() {
           />
         </div>
       </div>
+
+      {/* Acciones del header */}
       <div className="flex items-center gap-4">
-        <button className="relative p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors active:opacity-80 scale-98">
+        {/* Notificaciones */}
+        <button className="relative p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors active:opacity-80">
           <span className="material-symbols-outlined">notifications</span>
           <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-error rounded-full border-2 border-surface"></span>
         </button>
-        <Link href="/tienda/carrito" className="relative p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors active:opacity-80 scale-98">
+
+        {/* Carrito */}
+        <Link href="/tienda/carrito" className="relative p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors active:opacity-80">
           <span className="material-symbols-outlined">shopping_cart</span>
         </Link>
-        <Link href="/perfil" className="flex items-center gap-3 cursor-pointer p-1 pr-3 hover:bg-surface-container-low rounded-full transition-colors active:opacity-80 scale-98">
-          <img alt="Perfil" className="w-8 h-8 rounded-full object-cover border border-outline-variant" src="https://i.pravatar.cc/150?u=vetsync" />
-          <div className="hidden md:flex flex-col">
-            <span className="font-label-md font-bold text-on-surface">Dr. Carlos M.</span>
-            <span className="font-label-sm text-on-surface-variant text-[11px]">Veterinario</span>
-          </div>
-          <span className="material-symbols-outlined text-on-surface-variant hidden md:block">arrow_drop_down</span>
-        </Link>
+
+        {/* Perfil con menú desplegable */}
+        <div className="relative">
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="flex items-center gap-3 cursor-pointer p-1 pr-3 hover:bg-surface-container-low rounded-full transition-colors active:opacity-80"
+          >
+            <img
+              alt="Perfil"
+              className="w-8 h-8 rounded-full object-cover border border-outline-variant"
+              src={avatarUrl || 'https://i.pravatar.cc/150?u=default'}
+            />
+            <div className="hidden md:flex flex-col text-left">
+              <span className="font-label-md font-bold text-on-surface text-sm leading-tight">
+                {displayName || '...'}
+              </span>
+              <span className="font-label-sm text-on-surface-variant text-[11px]">
+                {roleLabel || '...'}
+              </span>
+            </div>
+            <span className="material-symbols-outlined text-on-surface-variant hidden md:block">
+              arrow_drop_down
+            </span>
+          </button>
+
+          {/* Menú desplegable */}
+          {menuOpen && (
+            <div className="absolute right-0 top-12 w-48 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-lg py-2 z-50">
+              <Link
+                href="/perfil"
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-2 px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low transition-colors"
+              >
+                <span className="material-symbols-outlined text-base">person</span>
+                Mi Perfil
+              </Link>
+              <hr className="my-1 border-outline-variant/50" />
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-error hover:bg-error-container/30 transition-colors"
+              >
+                <span className="material-symbols-outlined text-base">logout</span>
+                Cerrar Sesión
+              </button>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Cerrar menú al hacer click fuera */}
+      {menuOpen && (
+        <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
+      )}
     </header>
   );
 }
