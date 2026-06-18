@@ -81,7 +81,7 @@ export default function Sidebar() {
         )}
 
         {userRole !== 'CLIENTE' && (
-          <Link className={getLinkClass('/reportes')} href="#">
+          <Link className={getLinkClass('/reportes')} href="/reportes">
             <span className="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>
             <span className="font-label-md text-label-md">Reportes</span>
           </Link>
