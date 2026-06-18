@@ -1,8 +1,9 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 
 export default function HistorialClinico() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <div className="space-y-8 pb-12">
       {/* Hero Pet Profile Section */}
@@ -46,7 +47,10 @@ export default function HistorialClinico() {
           </div>
         </div>
         <div className="flex flex-col gap-2 w-full md:w-auto z-10">
-          <button className="w-full px-6 py-2.5 bg-primary text-on-primary rounded-xl text-sm font-semibold flex items-center justify-center gap-2 hover:bg-primary-container transition-all shadow-sm active:scale-95">
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="w-full px-6 py-2.5 bg-primary text-on-primary rounded-xl text-sm font-semibold flex items-center justify-center gap-2 hover:bg-primary-container transition-all shadow-sm active:scale-95"
+          >
             <span className="material-symbols-outlined text-[20px]">add</span>
             Nueva Consulta
           </button>
@@ -188,6 +192,63 @@ export default function HistorialClinico() {
           </article>
         </section>
       </div>
+
+      {/* Modal Nueva Consulta */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-surface-container-lowest w-full max-w-lg rounded-2xl p-6 shadow-xl relative animate-in fade-in zoom-in-95 duration-200">
+            <button 
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-4 right-4 text-on-surface-variant hover:text-primary transition-colors"
+            >
+              <span className="material-symbols-outlined">close</span>
+            </button>
+            <h3 className="text-xl font-bold text-primary mb-6 flex items-center gap-2">
+              <span className="material-symbols-outlined text-[24px]">add_circle</span>
+              Registrar Nueva Consulta
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider block mb-2">Motivo / Síntomas</label>
+                <textarea className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary focus:border-primary transition-colors outline-none text-on-surface resize-none" rows={4} placeholder="Describe los síntomas que presenta el paciente..."></textarea>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider block mb-2">Peso (kg)</label>
+                  <input type="number" step="0.1" className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary focus:border-primary transition-colors outline-none text-on-surface" placeholder="Ej. 32.5" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider block mb-2">Temperatura (°C)</label>
+                  <input type="number" step="0.1" className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary focus:border-primary transition-colors outline-none text-on-surface" placeholder="Ej. 38.5" />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider block mb-2">Diagnóstico Preliminar</label>
+                <input type="text" className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary focus:border-primary transition-colors outline-none text-on-surface" placeholder="Diagnóstico o sospecha clínica..." />
+              </div>
+              
+              <div className="flex gap-3 pt-4 mt-2 border-t border-outline-variant/30">
+                <button 
+                  onClick={() => setIsModalOpen(false)}
+                  className="w-1/3 py-3 border border-outline-variant text-on-surface-variant rounded-xl font-bold hover:bg-surface-container-low transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  onClick={() => {
+                    alert("Consulta registrada exitosamente (Modo Demostración)");
+                    setIsModalOpen(false);
+                  }}
+                  className="w-2/3 py-3 bg-primary text-on-primary rounded-xl font-bold hover:bg-primary-container transition-colors shadow-sm flex items-center justify-center gap-2"
+                >
+                  <span className="material-symbols-outlined text-[20px]">save</span>
+                  Guardar Consulta
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
