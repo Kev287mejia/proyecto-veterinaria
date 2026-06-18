@@ -39,8 +39,9 @@ export default function Header() {
       setDisplayName(name);
       setRoleLabel(profile?.role === 'vet' ? 'Veterinario' : 'Dueño de Mascota');
 
-      // Avatar: iniciales como fallback visual via pravatar basado en email
-      setAvatarUrl(`https://i.pravatar.cc/150?u=${user.email}`);
+      // Avatar: mascota única generada por DiceBear basada en el email del usuario
+      const seed = encodeURIComponent(user.email ?? 'default');
+      setAvatarUrl(`https://api.dicebear.com/9.x/thumbs/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc&shapeColor=0a5b83,1c799f,69d2e7`);
     }
     loadUser();
   }, []);
