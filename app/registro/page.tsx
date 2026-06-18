@@ -41,7 +41,13 @@ export default function Registro() {
     if (error) {
       setError(error.message);
       setLoading(false);
-    } else {
+    } else if (data.user) {
+      // Guardar el perfil directamente en la tabla profiles
+      await supabase.from('profiles').upsert({
+        id: data.user.id,
+        full_name: name,
+        role: role,
+      });
       router.push('/login');
     }
   };

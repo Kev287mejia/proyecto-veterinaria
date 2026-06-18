@@ -15,8 +15,15 @@ export default async function Dashboard() {
   const { data: profile } = await supabase
     .from('profiles')
     .select('*')
-    .eq('id', user.id)
+    .eq('id', user!.id)
     .single();
+
+  // Nombre: preferir profile.full_name, luego user_metadata, luego fallback
+  const displayName =
+    profile?.full_name ||
+    user!.user_metadata?.full_name ||
+    user!.user_metadata?.name ||
+    'Usuario';
 
   const roleName = profile?.role === 'vet' ? 'Veterinario / Clínica' : 'Dueño de Mascota';
 
@@ -25,10 +32,10 @@ export default async function Dashboard() {
       {/* Welcome Header */}
       <div className="mb-8">
         <h1 className="font-headline-lg text-headline-lg text-primary">
-          Hola, {profile?.full_name || 'Usuario'} 👋
+          Hola, {displayName}
         </h1>
         <p className="font-body-lg text-body-lg text-on-surface-variant">
-          Panel de Control ({roleName}) - Resumen de actividad para hoy.
+          Panel de Control ({roleName}) — Resumen de actividad para hoy.
         </p>
       </div>
       
