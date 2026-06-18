@@ -44,6 +44,26 @@ export default function AdminUsers() {
     }
   };
 
+  const handleDeleteUser = async (userId: string, userName: string) => {
+    const confirmDelete = confirm(`¿Estás seguro que deseas eliminar permanentemente al usuario "${userName || 'Sin nombre'}"?\nEsta acción no se puede deshacer.`);
+    if (!confirmDelete) return;
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', userId);
+
+      if (error) throw error;
+
+      setUsers(users.filter(u => u.id !== userId));
+      alert("Usuario eliminado correctamente.");
+    } catch (error: any) {
+      console.error("Error deleting user:", error);
+      alert("No se pudo eliminar el usuario. Si tiene mascotas, citas o clínicas asociadas, deberás eliminarlas primero para mantener la integridad de la base de datos.");
+    }
+  };
+
   const filteredUsers = users.filter(u => 
     (u.full_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
     (u.role || '').toLowerCase().includes(searchQuery.toLowerCase())
@@ -120,15 +140,24 @@ export default function AdminUsers() {
                     </span>
                   </td>
                   <td className="p-4">
-                    <select
-                      value={u.role}
-                      onChange={(e) => handleRoleChange(u.id, e.target.value)}
-                      className="bg-surface-container border border-outline-variant text-on-surface text-sm rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary focus:outline-none"
-                    >
-                      <option value="owner">Dueño (Owner)</option>
-                      <option value="vet">Veterinario/Clínica (Vet)</option>
-                      <option value="admin">Super Admin (Admin)</option>
-                    </select>
+                    <div className="flex items-center gap-3">
+                      <select
+                        value={u.role}
+                        onChange={(e) => handleRoleChange(u.id, e.target.value)}
+                        className="bg-surface-container border border-outline-variant text-on-surface text-sm rounded-xl px-3 py-2 focus:ring-2 focus:ring-primary focus:outline-none"
+                      >
+                        <option value="owner">Dueño (Owner)</option>
+                        <option value="vet">Veterinario/Clínica (Vet)</option>
+                        <option value="admin">Super Admin (Admin)</option>
+                      </select>
+                      <button
+                        onClick={() => handleDeleteUser(u.id, u.full_name)}
+                        className="w-9 h-9 rounded-xl hover:bg-error-container text-on-surface-variant hover:text-error flex items-center justify-center transition-all border border-transparent hover:border-error/20"
+                        title="Eliminar Usuario"
+                      >
+                        <span className="material-symbols-outlined text-[20px]">delete</span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
