@@ -434,11 +434,11 @@ export default function Citas() {
                         {getStatusText(appt.status)}
                       </span>
                       <div className="flex gap-1">
-                        {appt.status === 'pending' && (
+                        {appt.status === 'pending' && profile?.role === 'vet' && (
                           <button 
                             onClick={() => handleUpdateStatus(appt.id, 'confirmed')}
                             className="p-1 hover:bg-surface-container-high rounded text-secondary transition-colors"
-                            title="Confirmar Cita"
+                            title="Aceptar Cita"
                           >
                             <span className="material-symbols-outlined text-base">check_circle</span>
                           </button>
@@ -447,7 +447,7 @@ export default function Citas() {
                           <button 
                             onClick={() => handleUpdateStatus(appt.id, 'cancelled')}
                             className="p-1 hover:bg-surface-container-high rounded text-error transition-colors"
-                            title="Cancelar Cita"
+                            title={profile?.role === 'vet' && appt.status === 'pending' ? "Rechazar Cita" : "Cancelar Cita"}
                           >
                             <span className="material-symbols-outlined text-base">cancel</span>
                           </button>
