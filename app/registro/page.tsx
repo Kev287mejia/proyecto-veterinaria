@@ -11,6 +11,8 @@ export default function Registro() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -47,6 +49,8 @@ export default function Registro() {
         id: data.user.id,
         full_name: name,
         role: role,
+        phone: phone,
+        address: address,
       });
       router.push('/login');
     }
@@ -111,6 +115,30 @@ export default function Registro() {
               placeholder="ejemplo@correo.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-on-surface mb-2" htmlFor="phone">Teléfono</label>
+            <input 
+              className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary focus:border-primary transition-colors outline-none text-on-surface" 
+              id="phone" 
+              type="tel" 
+              placeholder="+504 1234-5678"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-on-surface mb-2" htmlFor="address">Dirección</label>
+            <input 
+              className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary focus:border-primary transition-colors outline-none text-on-surface" 
+              id="address" 
+              type="text" 
+              placeholder="Col. Miraflores, Bloque 4, Casa 12"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
               required
             />
           </div>

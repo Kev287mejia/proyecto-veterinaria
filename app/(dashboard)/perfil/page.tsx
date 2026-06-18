@@ -12,6 +12,7 @@ export default function Perfil() {
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   
@@ -34,6 +35,7 @@ export default function Perfil() {
         setProfile(userProfile);
         setFullName(userProfile.full_name || '');
         setPhone(userProfile.phone || '');
+        setAddress(userProfile.address || '');
       }
     }
     setLoading(false);
@@ -48,6 +50,7 @@ export default function Perfil() {
     if (profile) {
       setFullName(profile.full_name || '');
       setPhone(profile.phone || '');
+      setAddress(profile.address || '');
     }
     setNewPassword('');
     setConfirmPassword('');
@@ -75,10 +78,10 @@ export default function Perfil() {
 
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      // 1. Update Profile (full_name, phone)
+      // 1. Update Profile (full_name, phone, address)
       const { error: profileError } = await supabase
         .from('profiles')
-        .update({ full_name: fullName, phone: phone })
+        .update({ full_name: fullName, phone: phone, address: address })
         .eq('id', user.id);
 
       if (profileError) {
@@ -105,7 +108,7 @@ export default function Perfil() {
       setConfirmPassword('');
       
       // Update local profile state
-      setProfile({ ...profile, full_name: fullName, phone: phone });
+      setProfile({ ...profile, full_name: fullName, phone: phone, address: address });
     }
     setSaving(false);
   };
@@ -202,6 +205,18 @@ export default function Perfil() {
                   value={phone}
                   placeholder="+504 1234-5678"
                   onChange={(e) => setPhone(e.target.value)}
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2" htmlFor="address">Dirección</label>
+                <input 
+                  className="w-full px-4 py-3.5 rounded-xl border border-outline-variant bg-surface focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none text-on-surface font-medium" 
+                  id="address" 
+                  type="text" 
+                  value={address}
+                  placeholder="Tu dirección completa"
+                  onChange={(e) => setAddress(e.target.value)}
                 />
               </div>
             </div>
