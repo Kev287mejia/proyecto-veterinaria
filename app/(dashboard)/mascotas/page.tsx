@@ -72,6 +72,7 @@ export default function Mascotas() {
   const [selectedStatus, setSelectedStatus] = useState('Todos');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [profile, setProfile] = useState<any>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
 
@@ -169,32 +170,45 @@ export default function Mascotas() {
   // Handle registering a new pet
   const handleAddPet = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newName || !newBreed || !newAge || !newWeight || !currentUser) return;
+    if (!newName || !newBreed || !newWeight || !currentUser) {
+      alert('Por favor completa todos los campos requeridos.');
+      return;
+    }
 
-    // Use a default placeholder dog image based on species
-    let image = 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400'; // Dog default
+    setSubmitting(true);
+
+    // Use a default placeholder image based on species
+    let image = 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400';
     if (newSpecies === 'Felinos') {
-      image = 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400'; // Cat default
+      image = 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400';
     } else if (newSpecies === 'Exóticos') {
-      image = 'https://images.unsplash.com/photo-1507666480287-c11226b9f27d?w=400'; // Rabbit default
+      image = 'https://images.unsplash.com/photo-1507666480287-c11226b9f27d?w=400';
     }
 
     const cleanWeight = parseFloat(newWeight.replace(/[^\d.]/g, '')) || 0;
 
+    const insertData: any = {
+      name: newName,
+      species: newSpecies,
+      breed: newBreed,
+      weight: cleanWeight,
+      medical_notes: newStatus,
+      avatar_url: image,
+      owner_id: currentUser.id,  // siempre asignar al usuario actual
+    };
+
+    // Solo agregar birth_date si el usuario ingresó la edad
+    if (newAge.trim()) {
+      insertData.birth_date = calculateBirthDate(newAge);
+    }
+
     const { data: newPetData, error } = await supabase
       .from('pets')
-      .insert({
-        name: newName,
-        species: newSpecies,
-        breed: newBreed,
-        birth_date: calculateBirthDate(newAge),
-        weight: cleanWeight,
-        medical_notes: newStatus,
-        avatar_url: image,
-        owner_id: profile?.role === 'owner' ? currentUser.id : null
-      })
+      .insert(insertData)
       .select()
       .single();
+
+    setSubmitting(false);
 
     if (error) {
       console.error('Error inserting pet:', error);
@@ -216,13 +230,12 @@ export default function Mascotas() {
       setPets([addedPet, ...pets]);
     }
 
-    // Clear form states
+    // Limpiar formulario y cerrar modal
     setNewName('');
     setNewBreed('');
     setNewAge('');
     setNewWeight('');
     setNewStatus('Saludable');
-    
     setIsAddModalOpen(false);
   };
 
@@ -609,9 +622,10 @@ export default function Mascotas() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-primary hover:bg-primary-container text-on-primary rounded-xl text-sm font-semibold shadow-md active:scale-95 transition-all cursor-pointer"
+                  disabled={submitting}
+                  className="px-5 py-2.5 bg-primary hover:bg-primary-container text-on-primary rounded-xl text-sm font-semibold shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Guardar
+                  {submitting ? 'Guardando...' : 'Guardar'}
                 </button>
               </div>
             </form>
