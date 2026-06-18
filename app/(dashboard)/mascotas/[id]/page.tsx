@@ -12,6 +12,7 @@ export default function PetDetails() {
   const supabase = createClient();
   const [loading, setLoading] = useState(true);
   const [pet, setPet] = useState<any>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [medicalRecords, setMedicalRecords] = useState<any[]>([]);
   const [vaccinations, setVaccinations] = useState<any[]>([]);
 
@@ -46,8 +47,9 @@ export default function PetDetails() {
           .order('administered_date', { ascending: false });
 
         if (vaxData) setVaccinations(vaxData);
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error fetching pet details:', err);
+        setErrorMsg(err?.message || JSON.stringify(err));
       } finally {
         setLoading(false);
       }
@@ -73,6 +75,16 @@ export default function PetDetails() {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (errorMsg) {
+    return (
+      <div className="p-8 text-center text-error">
+        <h2 className="text-xl font-bold mb-2">Error al cargar la mascota</h2>
+        <p className="mb-4">{errorMsg}</p>
+        <Link href="/mascotas" className="text-primary hover:underline">Volver a Mascotas</Link>
       </div>
     );
   }
