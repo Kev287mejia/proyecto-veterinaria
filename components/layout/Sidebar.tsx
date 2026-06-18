@@ -73,14 +73,14 @@ export default function Sidebar() {
           <span className="material-symbols-outlined" data-icon="pets">pets</span>
           <span className="font-label-md text-label-md">Mascotas</span>
         </Link>
-        {userRole !== 'CLIENTE' && (
+        {userRole === 'VETERINARIO' && (
           <Link className={getLinkClass('/clientes')} href="/clientes">
             <span className="material-symbols-outlined" data-icon="group">group</span>
             <span className="font-label-md text-label-md">Clientes</span>
           </Link>
         )}
 
-        {userRole !== 'CLIENTE' && (
+        {userRole === 'VETERINARIO' && (
           <Link className={getLinkClass('/reportes')} href="/reportes">
             <span className="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>
             <span className="font-label-md text-label-md">Reportes</span>
