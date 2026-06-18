@@ -15,11 +15,29 @@ export default function PetDetails() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [medicalRecords, setMedicalRecords] = useState<any[]>([]);
   const [vaccinations, setVaccinations] = useState<any[]>([]);
+  
+  const [userProfile, setUserProfile] = useState<any>(null);
+  
+  // Modals state
+  const [showMedModal, setShowMedModal] = useState(false);
+  const [medForm, setMedForm] = useState({ diagnosis: '', treatment: '', notes: '' });
+  const [isSubmittingMed, setIsSubmittingMed] = useState(false);
+
+  const [showVaxModal, setShowVaxModal] = useState(false);
+  const [vaxForm, setVaxForm] = useState({ vaccine_name: '', administered_date: new Date().toISOString().split('T')[0], next_due_date: '' });
+  const [isSubmittingVax, setIsSubmittingVax] = useState(false);
 
   useEffect(() => {
     if (!id) return;
     async function loadPetData() {
       try {
+        // Fetch current user profile to determine role
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+          if (profile) setUserProfile(profile);
+        }
+
         // Fetch pet details
         const { data: petData, error: petError } = await supabase
           .from('pets')
@@ -56,6 +74,59 @@ export default function PetDetails() {
     }
     loadPetData();
   }, [id]);
+
+  const handleAddMedRecord = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!medForm.diagnosis) return;
+    setIsSubmittingMed(true);
+    try {
+      const { data, error } = await supabase.from('medical_records').insert({
+        pet_id: id,
+        vet_id: userProfile?.id,
+        diagnosis: medForm.diagnosis,
+        treatment: medForm.treatment,
+        notes: medForm.notes,
+        record_date: new Date().toISOString()
+      }).select('*, clinic:vet_clinics(clinic_name)').single();
+      
+      if (error) throw error;
+      if (data) {
+        setMedicalRecords([data, ...medicalRecords]);
+        setShowMedModal(false);
+        setMedForm({ diagnosis: '', treatment: '', notes: '' });
+      }
+    } catch (err) {
+      console.error('Error adding medical record:', err);
+    } finally {
+      setIsSubmittingMed(false);
+    }
+  };
+
+  const handleAddVaxRecord = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!vaxForm.vaccine_name) return;
+    setIsSubmittingVax(true);
+    try {
+      const { data, error } = await supabase.from('vaccinations').insert({
+        pet_id: id,
+        vet_id: userProfile?.id,
+        vaccine_name: vaxForm.vaccine_name,
+        administered_date: vaxForm.administered_date || new Date().toISOString().split('T')[0],
+        next_due_date: vaxForm.next_due_date || null
+      }).select('*, clinic:vet_clinics(clinic_name)').single();
+      
+      if (error) throw error;
+      if (data) {
+        setVaccinations([data, ...vaccinations]);
+        setShowVaxModal(false);
+        setVaxForm({ vaccine_name: '', administered_date: new Date().toISOString().split('T')[0], next_due_date: '' });
+      }
+    } catch (err) {
+      console.error('Error adding vaccine:', err);
+    } finally {
+      setIsSubmittingVax(false);
+    }
+  };
 
   function calculateAge(birthDateStr: string | null): string {
     if (!birthDateStr) return 'Edad desc.';
@@ -153,11 +224,22 @@ export default function PetDetails() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Historial Clínico */}
         <div>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 bg-primary-container text-on-primary-container rounded-xl">
-              <span className="material-symbols-outlined">medical_information</span>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary-container text-on-primary-container rounded-xl">
+                <span className="material-symbols-outlined">medical_information</span>
+              </div>
+              <h3 className="text-title-md font-bold text-on-surface">Historial Clínico</h3>
             </div>
-            <h3 className="text-title-md font-bold text-on-surface">Historial Clínico</h3>
+            {userProfile?.role === 'vet' && (
+              <button 
+                onClick={() => setShowMedModal(true)} 
+                className="bg-primary text-on-primary text-sm px-4 py-2 rounded-xl font-semibold flex items-center gap-1 hover:bg-primary/90 transition-all shadow-sm"
+              >
+                <span className="material-symbols-outlined text-[18px]">add</span>
+                Añadir
+              </button>
+            )}
           </div>
 
           <div className="space-y-4">
@@ -203,11 +285,22 @@ export default function PetDetails() {
 
         {/* Vacunación */}
         <div>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 bg-secondary-container text-on-secondary-container rounded-xl">
-              <span className="material-symbols-outlined">vaccines</span>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-secondary-container text-on-secondary-container rounded-xl">
+                <span className="material-symbols-outlined">vaccines</span>
+              </div>
+              <h3 className="text-title-md font-bold text-on-surface">Registro de Vacunas</h3>
             </div>
-            <h3 className="text-title-md font-bold text-on-surface">Registro de Vacunación</h3>
+            {userProfile?.role === 'vet' && (
+              <button 
+                onClick={() => setShowVaxModal(true)} 
+                className="bg-secondary text-on-secondary text-sm px-4 py-2 rounded-xl font-semibold flex items-center gap-1 hover:bg-secondary/90 transition-all shadow-sm"
+              >
+                <span className="material-symbols-outlined text-[18px]">add</span>
+                Añadir
+              </button>
+            )}
           </div>
 
           <div className="space-y-4">
@@ -250,6 +343,80 @@ export default function PetDetails() {
           </div>
         </div>
       </div>
+
+      {/* MODALS FOR VET */}
+      {showMedModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-surface-container-lowest w-full max-w-lg rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            <div className="px-6 py-4 border-b border-outline-variant/30 flex justify-between items-center bg-surface-container-lowest sticky top-0 z-10">
+              <h3 className="text-xl font-bold text-primary">Añadir Registro Médico</h3>
+              <button onClick={() => setShowMedModal(false)} className="text-on-surface-variant hover:text-error transition-colors p-2">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto">
+              <form id="medForm" onSubmit={handleAddMedRecord} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-bold text-on-surface-variant mb-1">Diagnóstico <span className="text-error">*</span></label>
+                  <input required type="text" value={medForm.diagnosis} onChange={e => setMedForm({...medForm, diagnosis: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="Ej. Infección leve" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-on-surface-variant mb-1">Tratamiento</label>
+                  <input type="text" value={medForm.treatment} onChange={e => setMedForm({...medForm, treatment: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="Ej. Amoxicilina 50mg" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-on-surface-variant mb-1">Notas Adicionales</label>
+                  <textarea rows={3} value={medForm.notes} onChange={e => setMedForm({...medForm, notes: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface-container-lowest focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none" placeholder="Observaciones extras..."></textarea>
+                </div>
+              </form>
+            </div>
+            <div className="p-4 border-t border-outline-variant/30 bg-surface-container-lowest flex justify-end gap-3">
+              <button type="button" onClick={() => setShowMedModal(false)} className="px-6 py-2.5 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-low transition-colors">Cancelar</button>
+              <button type="submit" form="medForm" disabled={isSubmittingMed || !medForm.diagnosis} className="px-6 py-2.5 rounded-xl font-semibold bg-primary text-on-primary hover:bg-primary/90 transition-colors disabled:opacity-50">
+                {isSubmittingMed ? 'Guardando...' : 'Guardar Registro'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showVaxModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-surface-container-lowest w-full max-w-lg rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            <div className="px-6 py-4 border-b border-outline-variant/30 flex justify-between items-center bg-surface-container-lowest sticky top-0 z-10">
+              <h3 className="text-xl font-bold text-secondary">Añadir Vacuna</h3>
+              <button onClick={() => setShowVaxModal(false)} className="text-on-surface-variant hover:text-error transition-colors p-2">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto">
+              <form id="vaxForm" onSubmit={handleAddVaxRecord} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-bold text-on-surface-variant mb-1">Nombre de la Vacuna <span className="text-error">*</span></label>
+                  <input required type="text" value={vaxForm.vaccine_name} onChange={e => setVaxForm({...vaxForm, vaccine_name: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface-container-lowest focus:border-secondary focus:ring-2 focus:ring-secondary/20 outline-none transition-all" placeholder="Ej. Rabia, Parvovirus" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-bold text-on-surface-variant mb-1">Fecha Administración</label>
+                    <input type="date" required value={vaxForm.administered_date} onChange={e => setVaxForm({...vaxForm, administered_date: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface-container-lowest focus:border-secondary focus:ring-2 focus:ring-secondary/20 outline-none transition-all text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-on-surface-variant mb-1">Próxima Dosis (Opcional)</label>
+                    <input type="date" value={vaxForm.next_due_date} onChange={e => setVaxForm({...vaxForm, next_due_date: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface-container-lowest focus:border-secondary focus:ring-2 focus:ring-secondary/20 outline-none transition-all text-sm" />
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div className="p-4 border-t border-outline-variant/30 bg-surface-container-lowest flex justify-end gap-3">
+              <button type="button" onClick={() => setShowVaxModal(false)} className="px-6 py-2.5 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-low transition-colors">Cancelar</button>
+              <button type="submit" form="vaxForm" disabled={isSubmittingVax || !vaxForm.vaccine_name} className="px-6 py-2.5 rounded-xl font-semibold bg-secondary text-on-secondary hover:bg-secondary/90 transition-colors disabled:opacity-50">
+                {isSubmittingVax ? 'Guardando...' : 'Guardar Vacuna'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
