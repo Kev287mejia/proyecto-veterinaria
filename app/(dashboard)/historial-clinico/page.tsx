@@ -65,7 +65,7 @@ export default function HistorialClinico() {
           </div>
         </div>
         <div className="flex flex-col gap-2 w-full md:w-auto z-10">
-          {userRole !== 'CLIENTE' && (
+          {userRole === 'vet' && (
             <button 
               onClick={() => setIsModalOpen(true)}
               className="w-full px-6 py-2.5 bg-primary text-on-primary rounded-xl text-sm font-semibold flex items-center justify-center gap-2 hover:bg-primary-container transition-all shadow-sm active:scale-95"
@@ -202,7 +202,7 @@ export default function HistorialClinico() {
               </div>
             </div>
             
-            {userRole !== 'CLIENTE' && (
+            {userRole === 'vet' && (
               <div className="bg-surface-container-low p-4 px-6 flex justify-between items-center border-t border-outline-variant">
                 <span className="text-xs font-semibold text-on-surface-variant flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">history</span> Editado hace 2 horas</span>
                 <div className="flex gap-3 ml-auto">
