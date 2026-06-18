@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+
+const CART_KEY = 'vetsync_cart';
 
 interface Product {
   id: string;
@@ -116,13 +118,23 @@ export default function Tienda() {
   const [cart, setCart] = useState<{id: string; qty: number}[]>([]);
   const [sortBy, setSortBy] = useState('popular');
 
+  // Cargar carrito desde localStorage al montar
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(CART_KEY);
+      if (saved) setCart(JSON.parse(saved));
+    } catch {}
+  }, []);
+
   const addToCart = (productId: string) => {
     setCart(prev => {
       const existing = prev.find(i => i.id === productId);
-      if (existing) {
-        return prev.map(i => i.id === productId ? { ...i, qty: i.qty + 1 } : i);
-      }
-      return [...prev, { id: productId, qty: 1 }];
+      const updated = existing
+        ? prev.map(i => i.id === productId ? { ...i, qty: i.qty + 1 } : i)
+        : [...prev, { id: productId, qty: 1 }];
+      // Guardar en localStorage
+      try { localStorage.setItem(CART_KEY, JSON.stringify(updated)); } catch {}
+      return updated;
     });
   };
 
@@ -165,7 +177,10 @@ export default function Tienda() {
         </div>
         <div className="flex items-center gap-3">
           {/* Carrito */}
-          <button className="relative flex items-center gap-2 bg-surface-container-lowest border border-outline-variant px-4 py-2.5 rounded-xl text-sm font-semibold text-on-surface hover:bg-surface-container-low transition-all">
+          <Link
+            href="/tienda/carrito"
+            className="relative flex items-center gap-2 bg-surface-container-lowest border border-outline-variant px-4 py-2.5 rounded-xl text-sm font-semibold text-on-surface hover:bg-surface-container-low transition-all"
+          >
             <span className="material-symbols-outlined text-[20px] text-primary">shopping_cart</span>
             Mi Carrito
             {cartCount > 0 && (
@@ -173,7 +188,7 @@ export default function Tienda() {
                 {cartCount}
               </span>
             )}
-          </button>
+          </Link>
         </div>
       </div>
 
