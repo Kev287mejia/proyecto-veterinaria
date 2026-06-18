@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/utils/supabase/client';
+import Link from 'next/link';
 
 interface Pet {
   id: string;
@@ -399,9 +400,9 @@ export default function Mascotas() {
                   <p className="font-semibold text-xs text-on-surface">{pet.weight}</p>
                 </div>
               </div>
-              <button className="mt-6 w-full py-2 border border-outline-variant hover:border-primary hover:text-primary rounded-xl text-sm font-semibold transition-all cursor-pointer">
+              <Link href="/historial-clinico" className="block text-center mt-6 w-full py-2 border border-outline-variant hover:border-primary hover:text-primary rounded-xl text-sm font-semibold transition-all cursor-pointer">
                 Ver Historial
-              </button>
+              </Link>
             </div>
           ))}
           {/* Add New Pet Placeholder */}
@@ -448,9 +449,9 @@ export default function Mascotas() {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button className="px-4 py-1.5 border border-outline-variant hover:border-primary hover:text-primary rounded-lg text-sm font-semibold transition-all cursor-pointer">
+                    <Link href="/historial-clinico" className="px-4 py-1.5 border border-outline-variant hover:border-primary hover:text-primary rounded-lg text-sm font-semibold transition-all cursor-pointer">
                       Ver Historial
-                    </button>
+                    </Link>
                   </td>
                 </tr>
               ))}

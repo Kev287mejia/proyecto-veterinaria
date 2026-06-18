@@ -79,7 +79,7 @@ export default function Sidebar() {
             <span className="font-label-md text-label-md">Clientes</span>
           </Link>
         )}
-        <Link className={getLinkClass('/historial-clinico')} href="#">
+        <Link className={getLinkClass('/historial-clinico')} href="/historial-clinico">
           <span className="material-symbols-outlined" data-icon="medical_information">medical_information</span>
           <span className="font-label-md text-label-md">Historial Clínico</span>
         </Link>
