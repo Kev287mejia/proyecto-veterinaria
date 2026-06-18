@@ -28,6 +28,8 @@ interface Appointment {
 interface PetOption {
   id: string;
   name: string;
+  owner_name?: string;
+  owner_id?: string;
 }
 
 interface ClinicOption {
@@ -90,15 +92,21 @@ export default function Citas() {
         }
 
         // Load Owner's pets
-        let petsQuery = supabase.from('pets').select('id, name');
+        let petsQuery = supabase.from('pets').select('id, name, owner_id, owner:profiles!owner_id(full_name)');
         if (userProfile?.role === 'owner') {
           petsQuery = petsQuery.eq('owner_id', user.id);
         }
         const { data: petsData } = await petsQuery;
         if (petsData) {
-          setMyPets(petsData);
-          if (petsData.length > 0) {
-            setFormPetId(petsData[0].id);
+          const mappedPets = petsData.map((p: any) => ({
+            id: p.id,
+            name: p.name,
+            owner_name: p.owner?.full_name,
+            owner_id: p.owner_id
+          }));
+          setMyPets(mappedPets);
+          if (mappedPets.length > 0) {
+            setFormPetId(mappedPets[0].id);
           }
         }
 
@@ -146,16 +154,23 @@ export default function Citas() {
 
     const dateTimeStr = `${formDate}T${formTime}:00Z`;
 
+    const selectedPet = myPets.find(p => p.id === formPetId);
+    const targetOwnerId = (profile?.role === 'vet' || profile?.role === 'admin') 
+                            ? (selectedPet?.owner_id || currentUser.id)
+                            : currentUser.id;
+
+    const initialStatus = (profile?.role === 'vet' || profile?.role === 'admin') ? 'confirmed' : 'pending';
+
     const { data: newApptData, error } = await supabase
       .from('appointments')
       .insert({
         pet_id: formPetId,
         vet_id: formClinicId,
-        owner_id: currentUser.id,
+        owner_id: targetOwnerId,
         appointment_date: dateTimeStr,
         reason: formReason,
         notes: formNotes || null,
-        status: 'pending'
+        status: initialStatus
       })
       .select(`
         id,
@@ -494,7 +509,9 @@ export default function Citas() {
                 >
                   <option value="">Selecciona una mascota</option>
                   {myPets.map(pet => (
-                    <option key={pet.id} value={pet.id}>{pet.name}</option>
+                    <option key={pet.id} value={pet.id}>
+                      {pet.name} {pet.owner_name && (profile?.role === 'vet' || profile?.role === 'admin') ? `(Dueño: ${pet.owner_name})` : ''}
+                    </option>
                   ))}
                 </select>
                 {myPets.length === 0 && (
