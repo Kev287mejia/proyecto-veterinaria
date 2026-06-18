@@ -1,0 +1,315 @@
+"use client";
+
+import { useState } from 'react';
+import Link from 'next/link';
+
+interface Product {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  originalPrice?: number;
+  rating: number;
+  reviews: number;
+  image: string;
+  badge?: 'Nuevo' | 'Oferta' | 'Popular';
+  description: string;
+}
+
+const products: Product[] = [
+  {
+    id: '1',
+    name: 'Alimento Premium Royal Canin Adult',
+    category: 'Alimentos',
+    price: 450,
+    originalPrice: 520,
+    rating: 4.8,
+    reviews: 124,
+    image: 'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?w=400&auto=format&fit=crop',
+    badge: 'Oferta',
+    description: 'Nutrición completa y balanceada para perros adultos.'
+  },
+  {
+    id: '2',
+    name: 'Antipulgas Frontline Plus',
+    category: 'Medicamentos',
+    price: 280,
+    rating: 4.9,
+    reviews: 89,
+    image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&auto=format&fit=crop',
+    badge: 'Popular',
+    description: 'Protección contra pulgas y garrapatas por 1 mes.'
+  },
+  {
+    id: '3',
+    name: 'Collar Antiparasitario Seresto',
+    category: 'Accesorios',
+    price: 650,
+    rating: 4.7,
+    reviews: 56,
+    image: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400&auto=format&fit=crop',
+    badge: 'Nuevo',
+    description: 'Protección continua por hasta 8 meses contra pulgas.'
+  },
+  {
+    id: '4',
+    name: 'Shampoo Medicado para Perros',
+    category: 'Higiene',
+    price: 185,
+    originalPrice: 220,
+    rating: 4.5,
+    reviews: 43,
+    image: 'https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?w=400&auto=format&fit=crop',
+    badge: 'Oferta',
+    description: 'Fórmula dermatológica para piel sensible.'
+  },
+  {
+    id: '5',
+    name: 'Alimento Húmedo Gato Whiskas',
+    category: 'Alimentos',
+    price: 95,
+    rating: 4.3,
+    reviews: 201,
+    image: 'https://images.unsplash.com/photo-1606214174585-fe31582dc6ee?w=400&auto=format&fit=crop',
+    description: 'Sachets de sabores variados para gatos adultos.'
+  },
+  {
+    id: '6',
+    name: 'Cama Ortopédica para Mascotas',
+    category: 'Accesorios',
+    price: 890,
+    rating: 4.6,
+    reviews: 31,
+    image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=400&auto=format&fit=crop',
+    badge: 'Nuevo',
+    description: 'Espuma de memoria para descanso óptimo.'
+  },
+  {
+    id: '7',
+    name: 'Vitaminas y Suplementos Caninos',
+    category: 'Medicamentos',
+    price: 320,
+    rating: 4.7,
+    reviews: 67,
+    image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=400&auto=format&fit=crop',
+    description: 'Complejo vitamínico para articulaciones y pelaje.'
+  },
+  {
+    id: '8',
+    name: 'Juguete Interactivo Kong Classic',
+    category: 'Juguetes',
+    price: 210,
+    originalPrice: 250,
+    rating: 4.9,
+    reviews: 178,
+    image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&auto=format&fit=crop',
+    badge: 'Popular',
+    description: 'Juguete rellenable para estimulación mental.'
+  },
+];
+
+const categories = ['Todos', 'Alimentos', 'Medicamentos', 'Accesorios', 'Higiene', 'Juguetes'];
+
+export default function Tienda() {
+  const [selectedCategory, setSelectedCategory] = useState('Todos');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [cart, setCart] = useState<{id: string; qty: number}[]>([]);
+  const [sortBy, setSortBy] = useState('popular');
+
+  const addToCart = (productId: string) => {
+    setCart(prev => {
+      const existing = prev.find(i => i.id === productId);
+      if (existing) {
+        return prev.map(i => i.id === productId ? { ...i, qty: i.qty + 1 } : i);
+      }
+      return [...prev, { id: productId, qty: 1 }];
+    });
+  };
+
+  const cartCount = cart.reduce((sum, item) => sum + item.qty, 0);
+
+  const filtered = products
+    .filter(p => {
+      const matchCat = selectedCategory === 'Todos' || p.category === selectedCategory;
+      const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          p.category.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchCat && matchSearch;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'price-asc') return a.price - b.price;
+      if (sortBy === 'price-desc') return b.price - a.price;
+      if (sortBy === 'rating') return b.rating - a.rating;
+      return b.reviews - a.reviews; // popular
+    });
+
+  const getBadgeStyle = (badge?: string) => {
+    switch (badge) {
+      case 'Oferta': return 'bg-error text-white';
+      case 'Nuevo': return 'bg-secondary text-on-secondary';
+      case 'Popular': return 'bg-primary text-on-primary';
+      default: return '';
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h2 className="font-headline-lg text-[28px] md:text-[32px] text-primary tracking-tight font-bold">
+            Tienda Veterinaria
+          </h2>
+          <p className="text-on-surface-variant text-sm mt-1">
+            Productos de calidad para el bienestar de tu mascota.
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          {/* Carrito */}
+          <button className="relative flex items-center gap-2 bg-surface-container-lowest border border-outline-variant px-4 py-2.5 rounded-xl text-sm font-semibold text-on-surface hover:bg-surface-container-low transition-all">
+            <span className="material-symbols-outlined text-[20px] text-primary">shopping_cart</span>
+            Mi Carrito
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-primary text-on-primary text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                {cartCount}
+              </span>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Categorías */}
+      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        {categories.map(cat => (
+          <button
+            key={cat}
+            onClick={() => setSelectedCategory(cat)}
+            className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
+              selectedCategory === cat
+                ? 'bg-primary text-on-primary shadow-md'
+                : 'bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary'
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {/* Filtros y búsqueda */}
+      <div className="flex flex-col sm:flex-row gap-3 items-center">
+        <div className="relative flex-1 w-full">
+          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+          <input
+            type="text"
+            placeholder="Buscar productos..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none text-sm"
+          />
+        </div>
+        <select
+          value={sortBy}
+          onChange={e => setSortBy(e.target.value)}
+          className="px-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container-lowest text-sm text-on-surface focus:ring-2 focus:ring-primary outline-none cursor-pointer min-w-[180px]"
+        >
+          <option value="popular">Más populares</option>
+          <option value="rating">Mejor valorados</option>
+          <option value="price-asc">Precio: menor a mayor</option>
+          <option value="price-desc">Precio: mayor a menor</option>
+        </select>
+        <p className="text-sm text-on-surface-variant whitespace-nowrap">
+          <span className="font-bold text-primary">{filtered.length}</span> productos
+        </p>
+      </div>
+
+      {/* Grid de productos */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {filtered.map(product => {
+          const inCart = cart.find(i => i.id === product.id);
+          const discount = product.originalPrice
+            ? Math.round((1 - product.price / product.originalPrice) * 100)
+            : null;
+
+          return (
+            <div
+              key={product.id}
+              className="bg-surface-container-lowest border border-outline-variant/50 rounded-2xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group flex flex-col"
+            >
+              {/* Imagen */}
+              <div className="relative h-48 overflow-hidden bg-surface-container-low">
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                {product.badge && (
+                  <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide ${getBadgeStyle(product.badge)}`}>
+                    {product.badge}
+                  </span>
+                )}
+                {discount && (
+                  <span className="absolute top-3 right-3 bg-error text-white px-2 py-1 rounded-full text-[11px] font-bold">
+                    -{discount}%
+                  </span>
+                )}
+              </div>
+
+              {/* Info */}
+              <div className="p-4 flex flex-col flex-1">
+                <p className="text-[10px] text-on-surface-variant font-bold uppercase tracking-wider mb-1">{product.category}</p>
+                <h3 className="font-semibold text-on-surface text-sm leading-snug mb-2 line-clamp-2">{product.name}</h3>
+                <p className="text-xs text-on-surface-variant mb-3 line-clamp-2">{product.description}</p>
+
+                {/* Rating */}
+                <div className="flex items-center gap-1.5 mb-4">
+                  <div className="flex">
+                    {[1,2,3,4,5].map(star => (
+                      <span key={star} className={`material-symbols-outlined text-[14px] ${star <= Math.round(product.rating) ? 'text-amber-400' : 'text-outline-variant'}`}
+                        style={{ fontVariationSettings: star <= Math.round(product.rating) ? "'FILL' 1" : undefined }}>
+                        star
+                      </span>
+                    ))}
+                  </div>
+                  <span className="text-[11px] text-on-surface-variant">({product.reviews})</span>
+                </div>
+
+                {/* Precio y botón */}
+                <div className="mt-auto flex items-center justify-between">
+                  <div>
+                    <p className="text-lg font-bold text-primary">${product.price.toLocaleString()}</p>
+                    {product.originalPrice && (
+                      <p className="text-xs text-on-surface-variant line-through">${product.originalPrice.toLocaleString()}</p>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => addToCart(product.id)}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
+                      inCart
+                        ? 'bg-secondary-container text-on-secondary-container'
+                        : 'bg-primary text-on-primary hover:bg-primary/90 shadow-sm'
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-[18px]">
+                      {inCart ? 'check' : 'add_shopping_cart'}
+                    </span>
+                    {inCart ? `x${inCart.qty}` : 'Añadir'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+
+        {filtered.length === 0 && (
+          <div className="col-span-full py-20 text-center">
+            <span className="material-symbols-outlined text-6xl text-outline-variant">search_off</span>
+            <p className="text-on-surface-variant mt-4 font-medium">No se encontraron productos para tu búsqueda.</p>
+            <button onClick={() => { setSearchQuery(''); setSelectedCategory('Todos'); }}
+              className="mt-4 text-primary font-semibold text-sm hover:underline">
+              Limpiar filtros
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
