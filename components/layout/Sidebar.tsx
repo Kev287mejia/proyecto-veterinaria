@@ -6,6 +6,10 @@ import { usePathname } from 'next/navigation';
 export default function Sidebar() {
   const pathname = usePathname();
 
+  // TODO: Reemplazar con el rol real del usuario desde tu sistema de autenticación
+  // Cambia esto a 'ADMIN', 'VETERINARIO' o 'CLIENTE' para probar
+  const userRole: 'ADMIN' | 'VETERINARIO' | 'CLIENTE' = 'CLIENTE';
+
   const isActive = (path: string) => {
     if (path === '/') {
       return pathname === '/';
@@ -47,10 +51,12 @@ export default function Sidebar() {
           <span className="material-symbols-outlined" data-icon="pets">pets</span>
           <span className="font-label-md text-label-md">Mascotas</span>
         </Link>
-        <Link className={getLinkClass('/clientes')} href="#">
-          <span className="material-symbols-outlined" data-icon="group">group</span>
-          <span className="font-label-md text-label-md">Clientes</span>
-        </Link>
+        {userRole !== 'CLIENTE' && (
+          <Link className={getLinkClass('/clientes')} href="#">
+            <span className="material-symbols-outlined" data-icon="group">group</span>
+            <span className="font-label-md text-label-md">Clientes</span>
+          </Link>
+        )}
         <Link className={getLinkClass('/historial-clinico')} href="#">
           <span className="material-symbols-outlined" data-icon="medical_information">medical_information</span>
           <span className="font-label-md text-label-md">Historial Clínico</span>
@@ -59,16 +65,20 @@ export default function Sidebar() {
           <span className="material-symbols-outlined" data-icon="vaccines">vaccines</span>
           <span className="font-label-md text-label-md">Vacunación</span>
         </Link>
-        <Link className={getLinkClass('/reportes')} href="#">
-          <span className="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>
-          <span className="font-label-md text-label-md">Reportes</span>
-        </Link>
+        {userRole !== 'CLIENTE' && (
+          <Link className={getLinkClass('/reportes')} href="#">
+            <span className="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>
+            <span className="font-label-md text-label-md">Reportes</span>
+          </Link>
+        )}
       </nav>
       <div className="pt-4 border-t border-outline-variant mt-auto flex flex-col gap-1">
-        <Link className={getLinkClass('/admin')} href="/admin">
-          <span className="material-symbols-outlined" data-icon="admin_panel_settings">admin_panel_settings</span>
-          <span className="font-label-md text-label-md">Panel Admin</span>
-        </Link>
+        {userRole === 'ADMIN' && (
+          <Link className={getLinkClass('/admin')} href="/admin">
+            <span className="material-symbols-outlined" data-icon="admin_panel_settings">admin_panel_settings</span>
+            <span className="font-label-md text-label-md">Panel Admin</span>
+          </Link>
+        )}
         <Link className={getLinkClass('/perfil')} href="/perfil">
           <span className="material-symbols-outlined" data-icon="settings">settings</span>
           <span className="font-label-md text-label-md">Configuración</span>
