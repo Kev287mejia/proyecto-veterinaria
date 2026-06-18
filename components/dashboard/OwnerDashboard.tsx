@@ -30,6 +30,20 @@ export default async function OwnerDashboard({ userId }: { userId: string }) {
     .order('appointment_date', { ascending: true })
     .limit(3);
   const appointments = apptsData || [];
+
+  let upcomingVaccines: any[] = [];
+  if (pets.length > 0) {
+    const petIds = pets.map(p => p.id);
+    const { data: vaxData } = await supabase
+      .from('vaccines')
+      .select('id, name, next_due_date, pet:pets(name)')
+      .in('pet_id', petIds)
+      .not('next_due_date', 'is', null)
+      .order('next_due_date', { ascending: true })
+      .limit(3);
+    
+    upcomingVaccines = vaxData || [];
+  }
   return (
     <>
       {/* Mis Mascotas Section */}
@@ -128,12 +142,49 @@ export default async function OwnerDashboard({ userId }: { userId: string }) {
         </div>
         
         {/* Recordatorios de Salud */}
-        <div className="lg:col-span-5 bg-surface-container-lowest p-6 rounded-xl border border-outline-variant flex flex-col items-center justify-center text-center">
-          <span className="material-symbols-outlined text-[48px] text-outline-variant mb-4" data-icon="construction">construction</span>
-          <h4 className="font-title-md text-title-md text-primary mb-2">Recordatorios de Salud</h4>
-          <p className="text-body-sm text-on-surface-variant max-w-xs mx-auto">
-            Próximamente podrás visualizar el calendario de vacunas y recordatorios clínicos de tus mascotas aquí.
-          </p>
+        <div className="lg:col-span-5 bg-surface-container-lowest p-6 rounded-xl border border-outline-variant">
+          <div className="flex justify-between items-center mb-6">
+            <h4 className="font-title-md text-title-md text-primary">Recordatorios de Salud</h4>
+          </div>
+          
+          <div className="relative space-y-6 before:absolute before:left-[17px] before:top-2 before:bottom-2 before:w-[1px] before:bg-outline-variant">
+            {upcomingVaccines.length === 0 ? (
+              <div className="pl-9 py-2">
+                <p className="text-body-sm text-on-surface-variant">No hay recordatorios de vacunas próximos.</p>
+              </div>
+            ) : (
+              upcomingVaccines.map((vax) => {
+                const dueDate = new Date(vax.next_due_date);
+                const isOverdue = dueDate < new Date();
+                
+                // Calculate rough time string (e.g. "Venció hace 2 días", "En 2 semanas")
+                const timeDiff = dueDate.getTime() - new Date().getTime();
+                const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                
+                let timeText = "";
+                if (daysDiff < 0) {
+                  timeText = `Venció hace ${Math.abs(daysDiff)} día${Math.abs(daysDiff) === 1 ? '' : 's'}`;
+                } else if (daysDiff === 0) {
+                  timeText = "Vence hoy";
+                } else {
+                  timeText = `En ${daysDiff} día${daysDiff === 1 ? '' : 's'}`;
+                }
+
+                return (
+                  <div key={vax.id} className="relative flex gap-4 items-start pl-9">
+                    <div className={`absolute left-0 top-1 w-9 h-9 rounded-full bg-surface border-2 flex items-center justify-center z-10 ${isOverdue ? 'border-error text-error' : 'border-secondary text-secondary'}`}>
+                      <span className="material-symbols-outlined text-[18px]" data-icon="vaccines">vaccines</span>
+                    </div>
+                    <div>
+                      <p className={`text-body-sm font-semibold ${isOverdue ? 'text-error' : 'text-on-surface'}`}>{vax.name}</p>
+                      <p className="text-[12px] text-on-surface-variant">Próxima dosis para <b>{(vax.pet as any)?.name}</b>.</p>
+                      <p className={`text-[11px] font-bold mt-1 ${isOverdue ? 'text-error' : 'text-on-surface-variant'}`}>{timeText}</p>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
         </div>
         
         {/* Acceso Rápido / Servicios */}

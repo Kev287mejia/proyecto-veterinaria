@@ -24,7 +24,7 @@ export default function PetDetails() {
   const [isSubmittingMed, setIsSubmittingMed] = useState(false);
 
   const [showVaxModal, setShowVaxModal] = useState(false);
-  const [vaxForm, setVaxForm] = useState({ vaccine_name: '', administered_date: new Date().toISOString().split('T')[0], next_due_date: '' });
+  const [vaxForm, setVaxForm] = useState({ name: '', date_administered: new Date().toISOString().split('T')[0], next_due_date: '' });
   const [isSubmittingVax, setIsSubmittingVax] = useState(false);
 
   useEffect(() => {
@@ -59,10 +59,10 @@ export default function PetDetails() {
 
         // Fetch vaccinations
         const { data: vaxData } = await supabase
-          .from('vaccinations')
+          .from('vaccines')
           .select('*, clinic:vet_clinics(clinic_name)')
           .eq('pet_id', id)
-          .order('administered_date', { ascending: false });
+          .order('date_administered', { ascending: false });
 
         if (vaxData) setVaccinations(vaxData);
       } catch (err: any) {
@@ -104,14 +104,14 @@ export default function PetDetails() {
 
   const handleAddVaxRecord = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!vaxForm.vaccine_name) return;
+    if (!vaxForm.name) return;
     setIsSubmittingVax(true);
     try {
-      const { data, error } = await supabase.from('vaccinations').insert({
+      const { data, error } = await supabase.from('vaccines').insert({
         pet_id: id,
         vet_id: userProfile?.id,
-        vaccine_name: vaxForm.vaccine_name,
-        administered_date: vaxForm.administered_date || new Date().toISOString().split('T')[0],
+        name: vaxForm.name,
+        date_administered: vaxForm.date_administered || new Date().toISOString().split('T')[0],
         next_due_date: vaxForm.next_due_date || null
       }).select('*, clinic:vet_clinics(clinic_name)').single();
       
@@ -119,7 +119,7 @@ export default function PetDetails() {
       if (data) {
         setVaccinations([data, ...vaccinations]);
         setShowVaxModal(false);
-        setVaxForm({ vaccine_name: '', administered_date: new Date().toISOString().split('T')[0], next_due_date: '' });
+        setVaxForm({ name: '', date_administered: new Date().toISOString().split('T')[0], next_due_date: '' });
       }
     } catch (err) {
       console.error('Error adding vaccine:', err);
@@ -317,14 +317,14 @@ export default function PetDetails() {
                     <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${isOverdue ? 'bg-error' : 'bg-secondary'} rounded-l-2xl`}></div>
                     <div className="flex justify-between items-start mb-3">
                       <h4 className="text-base font-bold text-on-surface flex items-center gap-2">
-                        {vax.vaccine_name}
+                        {vax.name}
                       </h4>
                     </div>
                     <div className="grid grid-cols-2 gap-4 mt-4">
                       <div>
                         <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Administrada</p>
                         <p className="text-sm font-semibold text-on-surface">
-                          {new Date(vax.administered_date || vax.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
+                          {new Date(vax.date_administered || vax.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
                         </p>
                       </div>
                       {vax.next_due_date && (
@@ -393,12 +393,12 @@ export default function PetDetails() {
               <form id="vaxForm" onSubmit={handleAddVaxRecord} className="space-y-4">
                 <div>
                   <label className="block text-sm font-bold text-on-surface-variant mb-1">Nombre de la Vacuna <span className="text-error">*</span></label>
-                  <input required type="text" value={vaxForm.vaccine_name} onChange={e => setVaxForm({...vaxForm, vaccine_name: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface-container-lowest focus:border-secondary focus:ring-2 focus:ring-secondary/20 outline-none transition-all" placeholder="Ej. Rabia, Parvovirus" />
+                  <input required type="text" value={vaxForm.name} onChange={e => setVaxForm({...vaxForm, name: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface-container-lowest focus:border-secondary focus:ring-2 focus:ring-secondary/20 outline-none transition-all" placeholder="Ej. Rabia, Parvovirus" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-bold text-on-surface-variant mb-1">Fecha Administración</label>
-                    <input type="date" required value={vaxForm.administered_date} onChange={e => setVaxForm({...vaxForm, administered_date: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface-container-lowest focus:border-secondary focus:ring-2 focus:ring-secondary/20 outline-none transition-all text-sm" />
+                    <input type="date" value={vaxForm.date_administered} onChange={e => setVaxForm({...vaxForm, date_administered: e.target.value})} className="w-full px-4 py-3 rounded-xl border border-outline-variant bg-surface-container-lowest focus:border-secondary focus:ring-2 focus:ring-secondary/20 outline-none transition-all" />
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-on-surface-variant mb-1">Próxima Dosis (Opcional)</label>
@@ -409,7 +409,7 @@ export default function PetDetails() {
             </div>
             <div className="p-4 border-t border-outline-variant/30 bg-surface-container-lowest flex justify-end gap-3">
               <button type="button" onClick={() => setShowVaxModal(false)} className="px-6 py-2.5 rounded-xl font-semibold text-on-surface-variant hover:bg-surface-container-low transition-colors">Cancelar</button>
-              <button type="submit" form="vaxForm" disabled={isSubmittingVax || !vaxForm.vaccine_name} className="px-6 py-2.5 rounded-xl font-semibold bg-secondary text-on-secondary hover:bg-secondary/90 transition-colors disabled:opacity-50">
+              <button type="submit" form="vaxForm" disabled={isSubmittingVax || !vaxForm.name} className="px-6 py-2.5 rounded-xl font-semibold bg-secondary text-on-secondary hover:bg-secondary/90 transition-colors disabled:opacity-50">
                 {isSubmittingVax ? 'Guardando...' : 'Guardar Vacuna'}
               </button>
             </div>
