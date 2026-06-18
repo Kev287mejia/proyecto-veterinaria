@@ -86,6 +86,13 @@ export default function Sidebar() {
             <span className="font-label-md text-label-md">Reportes</span>
           </Link>
         )}
+
+        {userRole === 'ADMIN' && (
+          <Link className={getLinkClass('/superadmin')} href="/superadmin">
+            <span className="material-symbols-outlined text-error" data-icon="admin_panel_settings">admin_panel_settings</span>
+            <span className="font-label-md text-label-md text-error font-bold">Panel Admin</span>
+          </Link>
+        )}
       </nav>
       <div className="pt-4 border-t border-outline-variant mt-auto flex flex-col gap-1">
         {userRole === 'ADMIN' && (
