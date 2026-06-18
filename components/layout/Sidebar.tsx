@@ -93,12 +93,6 @@ export default function Sidebar({ isOpen = false, setIsOpen = (val: boolean) => 
         )}
       </nav>
       <div className="pt-4 border-t border-outline-variant mt-auto flex flex-col gap-1">
-        {userRole === 'ADMIN' && (
-          <Link className={getLinkClass('/admin')} href="/admin">
-            <span className="material-symbols-outlined" data-icon="admin_panel_settings">admin_panel_settings</span>
-            <span className="font-label-md text-label-md">Panel Admin</span>
-          </Link>
-        )}
         <Link className={getLinkClass('/perfil')} href="/perfil">
           <span className="material-symbols-outlined" data-icon="settings">settings</span>
           <span className="font-label-md text-label-md">Configuración</span>
