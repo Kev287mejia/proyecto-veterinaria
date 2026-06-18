@@ -46,7 +46,7 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div className="flex h-[60vh] items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
       </div>
     );
   }
@@ -54,88 +54,88 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div>
-        <h1 className="text-3xl font-bold text-white tracking-tight">Dashboard Global</h1>
-        <p className="text-slate-400 mt-2">Visión general del estado de Vetsync.</p>
+        <h1 className="text-display-sm font-bold text-on-surface tracking-tight">Dashboard Global</h1>
+        <p className="text-on-surface-variant mt-2">Visión general del estado de Vetsync.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* KPI Card 1 */}
-        <div className="bg-[#1e293b] border border-slate-700/50 p-6 rounded-3xl shadow-lg relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+        <div className="bg-surface-container-lowest border border-outline-variant p-6 rounded-3xl shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary-container rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
           <div className="flex items-center gap-4 relative z-10">
-            <div className="w-14 h-14 bg-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center border border-blue-500/30">
+            <div className="w-14 h-14 bg-primary-container text-on-primary-container rounded-2xl flex items-center justify-center">
               <span className="material-symbols-outlined text-3xl">domain</span>
             </div>
             <div>
-              <p className="text-slate-400 text-sm font-bold uppercase tracking-wider">Clínicas (Vets)</p>
-              <h2 className="text-4xl font-black text-white">{metrics.clinics}</h2>
+              <p className="text-on-surface-variant text-sm font-bold uppercase tracking-wider">Clínicas</p>
+              <h2 className="text-4xl font-black text-on-surface">{metrics.clinics}</h2>
             </div>
           </div>
         </div>
 
         {/* KPI Card 2 */}
-        <div className="bg-[#1e293b] border border-slate-700/50 p-6 rounded-3xl shadow-lg relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+        <div className="bg-surface-container-lowest border border-outline-variant p-6 rounded-3xl shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-tertiary-container rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
           <div className="flex items-center gap-4 relative z-10">
-            <div className="w-14 h-14 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center border border-emerald-500/30">
+            <div className="w-14 h-14 bg-tertiary-container text-on-tertiary-container rounded-2xl flex items-center justify-center">
               <span className="material-symbols-outlined text-3xl">groups</span>
             </div>
             <div>
-              <p className="text-slate-400 text-sm font-bold uppercase tracking-wider">Dueños (Owners)</p>
-              <h2 className="text-4xl font-black text-white">{metrics.users}</h2>
+              <p className="text-on-surface-variant text-sm font-bold uppercase tracking-wider">Dueños</p>
+              <h2 className="text-4xl font-black text-on-surface">{metrics.users}</h2>
             </div>
           </div>
         </div>
 
         {/* KPI Card 3 */}
-        <div className="bg-[#1e293b] border border-slate-700/50 p-6 rounded-3xl shadow-lg relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+        <div className="bg-surface-container-lowest border border-outline-variant p-6 rounded-3xl shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-secondary-container rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
           <div className="flex items-center gap-4 relative z-10">
-            <div className="w-14 h-14 bg-purple-500/20 text-purple-400 rounded-2xl flex items-center justify-center border border-purple-500/30">
+            <div className="w-14 h-14 bg-secondary-container text-on-secondary-container rounded-2xl flex items-center justify-center">
               <span className="material-symbols-outlined text-3xl">pets</span>
             </div>
             <div>
-              <p className="text-slate-400 text-sm font-bold uppercase tracking-wider">Mascotas Total</p>
-              <h2 className="text-4xl font-black text-white">{metrics.pets}</h2>
+              <p className="text-on-surface-variant text-sm font-bold uppercase tracking-wider">Mascotas Total</p>
+              <h2 className="text-4xl font-black text-on-surface">{metrics.pets}</h2>
             </div>
           </div>
         </div>
 
         {/* KPI Card 4 */}
-        <div className="bg-[#1e293b] border border-slate-700/50 p-6 rounded-3xl shadow-lg relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+        <div className="bg-surface-container-lowest border border-outline-variant p-6 rounded-3xl shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-error-container rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
           <div className="flex items-center gap-4 relative z-10">
-            <div className="w-14 h-14 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center border border-amber-500/30">
+            <div className="w-14 h-14 bg-error-container text-on-error-container rounded-2xl flex items-center justify-center">
               <span className="material-symbols-outlined text-3xl">calendar_month</span>
             </div>
             <div>
-              <p className="text-slate-400 text-sm font-bold uppercase tracking-wider">Citas Generadas</p>
-              <h2 className="text-4xl font-black text-white">{metrics.appointments}</h2>
+              <p className="text-on-surface-variant text-sm font-bold uppercase tracking-wider">Citas Generadas</p>
+              <h2 className="text-4xl font-black text-on-surface">{metrics.appointments}</h2>
             </div>
           </div>
         </div>
       </div>
 
       {/* System Status Mock */}
-      <div className="bg-[#1e293b] border border-slate-700/50 p-8 rounded-3xl shadow-lg">
-        <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-          <span className="material-symbols-outlined text-emerald-400">dns</span>
+      <div className="bg-surface-container-lowest border border-outline-variant p-8 rounded-3xl shadow-sm">
+        <h3 className="text-xl font-bold text-on-surface mb-6 flex items-center gap-2">
+          <span className="material-symbols-outlined text-tertiary">dns</span>
           Estado del Sistema
         </h3>
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-2xl border border-slate-700/50">
+          <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-2xl border border-outline-variant/50">
             <div className="flex items-center gap-3">
-              <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
-              <span className="font-bold text-slate-300">Base de Datos Supabase</span>
+              <div className="w-3 h-3 rounded-full bg-tertiary animate-pulse"></div>
+              <span className="font-bold text-on-surface">Base de Datos Supabase</span>
             </div>
-            <span className="text-emerald-400 text-sm font-mono bg-emerald-400/10 px-3 py-1 rounded-full">Operativo</span>
+            <span className="text-tertiary text-sm font-mono bg-tertiary-container px-3 py-1 rounded-full">Operativo</span>
           </div>
-          <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-2xl border border-slate-700/50">
+          <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-2xl border border-outline-variant/50">
             <div className="flex items-center gap-3">
-              <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
-              <span className="font-bold text-slate-300">Servidores Vercel</span>
+              <div className="w-3 h-3 rounded-full bg-tertiary animate-pulse"></div>
+              <span className="font-bold text-on-surface">Servidores Vercel</span>
             </div>
-            <span className="text-emerald-400 text-sm font-mono bg-emerald-400/10 px-3 py-1 rounded-full">Operativo</span>
+            <span className="text-tertiary text-sm font-mono bg-tertiary-container px-3 py-1 rounded-full">Operativo</span>
           </div>
         </div>
       </div>
