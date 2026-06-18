@@ -7,10 +7,13 @@ export default function OwnerDashboard() {
       <div className="mb-8">
         <div className="flex justify-between items-center mb-6">
           <h2 className="font-title-md text-title-md text-primary">Mis Mascotas</h2>
-          <button className="text-primary font-semibold text-body-sm hover:underline flex items-center gap-1">
+          <Link 
+            href="/mascotas"
+            className="text-primary font-semibold text-body-sm hover:underline flex items-center gap-1"
+          >
             <span className="material-symbols-outlined text-[20px]">add</span>
             Añadir Mascota
-          </button>
+          </Link>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
@@ -95,10 +98,13 @@ export default function OwnerDashboard() {
             </div>
           </div>
           
-          <button className="w-full mt-6 py-3 rounded-lg border border-outline-variant text-primary font-semibold text-sm hover:bg-surface-container-low transition-colors flex items-center justify-center gap-2">
+          <Link 
+            href="/citas"
+            className="w-full mt-6 py-3 rounded-lg border border-outline-variant text-primary font-semibold text-sm hover:bg-surface-container-low transition-colors flex items-center justify-center gap-2"
+          >
             <span className="material-symbols-outlined text-[18px]">calendar_add_on</span>
             Agendar nueva cita
-          </button>
+          </Link>
         </div>
         
         {/* Recordatorios de Salud */}
