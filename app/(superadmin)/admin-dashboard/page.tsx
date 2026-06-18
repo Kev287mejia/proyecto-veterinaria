@@ -116,29 +116,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* System Status Mock */}
-      <div className="bg-surface-container-lowest border border-outline-variant p-8 rounded-3xl shadow-sm">
-        <h3 className="text-xl font-bold text-on-surface mb-6 flex items-center gap-2">
-          <span className="material-symbols-outlined text-tertiary">dns</span>
-          Estado del Sistema
-        </h3>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-2xl border border-outline-variant/50">
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 rounded-full bg-tertiary animate-pulse"></div>
-              <span className="font-bold text-on-surface">Base de Datos Supabase</span>
-            </div>
-            <span className="text-tertiary text-sm font-mono bg-tertiary-container px-3 py-1 rounded-full">Operativo</span>
-          </div>
-          <div className="flex items-center justify-between p-4 bg-surface-container-low rounded-2xl border border-outline-variant/50">
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 rounded-full bg-tertiary animate-pulse"></div>
-              <span className="font-bold text-on-surface">Servidores Vercel</span>
-            </div>
-            <span className="text-tertiary text-sm font-mono bg-tertiary-container px-3 py-1 rounded-full">Operativo</span>
-          </div>
-        </div>
-      </div>
+
     </div>
   );
 }
