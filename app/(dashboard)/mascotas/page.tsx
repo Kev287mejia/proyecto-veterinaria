@@ -303,7 +303,11 @@ export default function Mascotas() {
             </button>
           </div>
           <button
-            onClick={() => setIsAddModalOpen(true)}
+            type="button"
+            onClick={() => {
+              console.log('Abriendo modal de mascota...');
+              setIsAddModalOpen(true);
+            }}
             className="flex items-center gap-2 bg-primary text-on-primary px-5 py-2.5 rounded-xl font-semibold hover:bg-primary-container transition-all active:scale-95 shadow-md text-sm cursor-pointer"
           >
             <span className="material-symbols-outlined">add</span>
