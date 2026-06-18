@@ -18,6 +18,7 @@ interface Appointment {
   owner: {
     id: string;
     full_name: string;
+    phone?: string;
   } | null;
   appointment_date: string;
   reason: string;
@@ -121,7 +122,7 @@ export default function Citas() {
             notes,
             pet:pets(id, name, breed, avatar_url),
             clinic:vet_clinics!vet_id(id, clinic_name),
-            owner:profiles!owner_id(id, full_name)
+            owner:profiles!owner_id(id, full_name, phone)
           `)
           .order('appointment_date', { ascending: true });
 
@@ -143,6 +144,17 @@ export default function Citas() {
     }
     loadData();
   }, []);
+
+  // Helper for WhatsApp Links
+  const openWhatsApp = (phone: string, message: string) => {
+    if (!phone) {
+      alert("El destinatario no tiene un número de teléfono registrado en su perfil.");
+      return;
+    }
+    const cleanPhone = phone.replace(/\D/g, '');
+    const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+  };
 
   // Handle adding a new appointment
   const handleAddAppointment = async (e: React.FormEvent) => {
@@ -192,6 +204,27 @@ export default function Citas() {
 
     if (newApptData) {
       setAppointments([...appointments, newApptData as any]);
+
+      // If owner is requesting, pop open WhatsApp to send to the Vet
+      if (initialStatus === 'pending') {
+        const fetchClinicOwner = async () => {
+          const { data: clinicData } = await supabase
+            .from('vet_clinics')
+            .select('owner:profiles!owner_id(phone)')
+            .eq('id', formClinicId)
+            .single();
+          
+          const vetPhone = (clinicData?.owner as any)?.phone;
+          if (vetPhone) {
+            const dateFmt = new Date(dateTimeStr).toLocaleString();
+            const msg = `¡Hola! He solicitado una nueva cita para mi mascota ${selectedPet?.name} el ${dateFmt}. El motivo es: ${formReason}.`;
+            openWhatsApp(vetPhone, msg);
+          } else {
+            console.log("Clinic owner has no phone registered.");
+          }
+        };
+        fetchClinicOwner();
+      }
     }
 
     // Reset Form fields
@@ -216,6 +249,18 @@ export default function Citas() {
     setAppointments(appointments.map(appt => 
       appt.id === id ? { ...appt, status: newStatus } : appt
     ));
+
+    // If vet is approving the appointment, pop open WhatsApp to notify the owner
+    if (newStatus === 'confirmed') {
+      const appt = appointments.find(a => a.id === id);
+      if (appt && appt.owner?.phone) {
+        const dateFmt = new Date(appt.appointment_date).toLocaleString();
+        const msg = `¡Hola ${appt.owner.full_name}! Te confirmamos que tu cita para ${appt.pet?.name} ha sido APROBADA para el ${dateFmt}.`;
+        openWhatsApp(appt.owner.phone, msg);
+      } else {
+         console.log("No owner phone found for this appointment");
+      }
+    }
   };
 
   // Filters logic
