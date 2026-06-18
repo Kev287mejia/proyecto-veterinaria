@@ -17,6 +17,17 @@ export default function AdminUsers() {
     full_name: '',
     phone: ''
   });
+
+  // Create states
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [createFormData, setCreateFormData] = useState({
+    email: '',
+    password: '',
+    full_name: '',
+    phone: '',
+    role: 'owner'
+  });
   
   useEffect(() => {
     Promise.all([fetchUsers(), fetchClinics()]);
@@ -109,6 +120,38 @@ export default function AdminUsers() {
     }
   };
 
+  const handleCreateUserSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreating(true);
+
+    try {
+      const res = await fetch('/api/create-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(createFormData)
+      });
+
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || 'Error al crear el usuario.');
+
+      alert("Usuario creado exitosamente.");
+      setIsCreateModalOpen(false);
+      setCreateFormData({
+        email: '',
+        password: '',
+        full_name: '',
+        phone: '',
+        role: 'owner'
+      });
+      fetchUsers();
+    } catch (error: any) {
+      console.error("Error creating user:", error);
+      alert("No se pudo crear el usuario: " + error.message);
+    } finally {
+      setCreating(false);
+    }
+  };
+
   const handleClinicChange = async (userId: string, newClinicId: string) => {
     try {
       // 1. Unlink this user from any other clinic first
@@ -162,15 +205,24 @@ export default function AdminUsers() {
           <p className="text-on-surface-variant mt-1">Administración global de accesos y roles del sistema.</p>
         </div>
         
-        <div className="relative w-full md:w-80">
-          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-          <input
-            type="text"
-            placeholder="Buscar por nombre o rol..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-surface-container-low border border-outline-variant rounded-2xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary transition-all shadow-inner"
-          />
+        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+          <div className="relative flex-1 sm:w-64">
+            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+            <input
+              type="text"
+              placeholder="Buscar por nombre o rol..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 bg-surface-container-low border border-outline-variant rounded-2xl text-on-surface focus:outline-none focus:ring-2 focus:ring-primary transition-all shadow-inner"
+            />
+          </div>
+          <button 
+            onClick={() => setIsCreateModalOpen(true)}
+            className="bg-primary hover:bg-primary/90 text-on-primary font-bold py-3 px-6 rounded-2xl transition-all shadow-md active:scale-95 flex items-center gap-2 justify-center whitespace-nowrap"
+          >
+            <span className="material-symbols-outlined">person_add</span>
+            Nuevo Usuario
+          </button>
         </div>
       </div>
 
@@ -283,6 +335,108 @@ export default function AdminUsers() {
           </table>
         </div>
       </div>
+
+      {/* Create User Modal */}
+      {isCreateModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 animate-in fade-in duration-200">
+          <div className="bg-surface-container-lowest rounded-3xl p-8 w-full max-w-lg shadow-2xl animate-in zoom-in-95 duration-200 border border-outline-variant">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-on-surface">Crear Nuevo Usuario</h2>
+              <button onClick={() => setIsCreateModalOpen(false)} className="text-on-surface-variant hover:bg-surface-container rounded-full p-1 transition-colors">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateUserSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-on-surface-variant ml-1">Nombre Completo *</label>
+                <input
+                  required
+                  type="text"
+                  value={createFormData.full_name}
+                  onChange={(e) => setCreateFormData({...createFormData, full_name: e.target.value})}
+                  className="w-full bg-surface-container-low border border-outline-variant text-on-surface rounded-2xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  placeholder="Ej. Juan Pérez"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-on-surface-variant ml-1">Correo Electrónico *</label>
+                  <input
+                    required
+                    type="email"
+                    value={createFormData.email}
+                    onChange={(e) => setCreateFormData({...createFormData, email: e.target.value})}
+                    className="w-full bg-surface-container-low border border-outline-variant text-on-surface rounded-2xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                    placeholder="ejemplo@vetsync.com"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-on-surface-variant ml-1">Contraseña *</label>
+                  <input
+                    required
+                    type="password"
+                    value={createFormData.password}
+                    onChange={(e) => setCreateFormData({...createFormData, password: e.target.value})}
+                    className="w-full bg-surface-container-low border border-outline-variant text-on-surface rounded-2xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                    placeholder="Mín. 6 caracteres"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-on-surface-variant ml-1">Teléfono</label>
+                  <input
+                    type="text"
+                    value={createFormData.phone}
+                    onChange={(e) => setCreateFormData({...createFormData, phone: e.target.value})}
+                    className="w-full bg-surface-container-low border border-outline-variant text-on-surface rounded-2xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                    placeholder="Ej. +34 600 000"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-on-surface-variant ml-1">Rol de Acceso *</label>
+                  <select
+                    value={createFormData.role}
+                    onChange={(e) => setCreateFormData({...createFormData, role: e.target.value})}
+                    className="w-full bg-surface-container-low border border-outline-variant text-on-surface rounded-2xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  >
+                    <option value="owner">Dueño (Owner)</option>
+                    <option value="vet">Veterinario/Clínica (Vet)</option>
+                    <option value="admin">Super Admin (Admin)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsCreateModalOpen(false)}
+                  className="flex-1 bg-surface-container hover:bg-surface-container-high text-on-surface font-bold py-3.5 rounded-2xl transition-all"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={creating}
+                  className="flex-1 bg-primary hover:bg-primary/90 text-on-primary font-bold py-3.5 rounded-2xl transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {creating ? (
+                    <span className="material-symbols-outlined animate-spin">refresh</span>
+                  ) : (
+                    <>
+                      <span className="material-symbols-outlined">person_add</span>
+                      Crear Cuenta
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Edit User Modal */}
       {isEditModalOpen && (
