@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { createClient } from '@/utils/supabase/client';
 
 const CART_KEY = 'vetsync_cart';
 
@@ -11,29 +12,39 @@ interface Product {
   category: string;
   price: number;
   originalPrice?: number;
-  image: string;
+  image_url: string;
 }
 
-const allProducts: Product[] = [
-  { id: '1', name: 'Alimento Premium Royal Canin Adult', category: 'Alimentos', price: 450, originalPrice: 520, image: 'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?w=400&auto=format&fit=crop' },
-  { id: '2', name: 'Antipulgas Frontline Plus', category: 'Medicamentos', price: 280, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&auto=format&fit=crop' },
-  { id: '3', name: 'Collar Antiparasitario Seresto', category: 'Accesorios', price: 650, image: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400&auto=format&fit=crop' },
-  { id: '4', name: 'Shampoo Medicado para Perros', category: 'Higiene', price: 185, originalPrice: 220, image: 'https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?w=400&auto=format&fit=crop' },
-  { id: '5', name: 'Alimento Húmedo Gato Whiskas', category: 'Alimentos', price: 95, image: 'https://images.unsplash.com/photo-1606214174585-fe31582dc6ee?w=400&auto=format&fit=crop' },
-  { id: '6', name: 'Cama Ortopédica para Mascotas', category: 'Accesorios', price: 890, image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=400&auto=format&fit=crop' },
-  { id: '7', name: 'Vitaminas y Suplementos Caninos', category: 'Medicamentos', price: 320, image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=400&auto=format&fit=crop' },
-  { id: '8', name: 'Juguete Interactivo Kong Classic', category: 'Juguetes', price: 210, originalPrice: 250, image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&auto=format&fit=crop' },
-];
+// allProducts se obtiene dinámicamente desde Supabase
 
 export default function Carrito() {
+  const supabase = createClient();
   const [cart, setCart] = useState<{ id: string; qty: number }[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [ordered, setOrdered] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(CART_KEY);
-      if (saved) setCart(JSON.parse(saved));
-    } catch {}
+    async function loadCartData() {
+      let savedCart: {id: string, qty: number}[] = [];
+      try {
+        const saved = localStorage.getItem(CART_KEY);
+        if (saved) {
+          savedCart = JSON.parse(saved);
+          setCart(savedCart);
+        }
+      } catch {}
+
+      if (savedCart.length > 0) {
+        const cartIds = savedCart.map(item => item.id);
+        const { data, error } = await supabase.from('products').select('*').in('id', cartIds);
+        if (data && !error) {
+          setAllProducts(data);
+        }
+      }
+      setLoading(false);
+    }
+    loadCartData();
   }, []);
 
   const saveCart = (updated: { id: string; qty: number }[]) => {
@@ -67,6 +78,14 @@ export default function Carrito() {
     clearCart();
     setOrdered(true);
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   if (ordered) {
     return (
@@ -116,7 +135,7 @@ export default function Carrito() {
             {cartItems.map(item => (
               <div key={item.id} className="bg-surface-container-lowest border border-outline-variant/50 rounded-2xl p-4 flex items-center gap-4 hover:shadow-sm transition-all">
                 <img
-                  src={item.image}
+                  src={item.image_url}
                   alt={item.name}
                   className="w-20 h-20 rounded-xl object-cover border border-outline-variant/30 shrink-0"
                 />

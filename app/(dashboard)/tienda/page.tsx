@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { createClient } from '@/utils/supabase/client';
 
 const CART_KEY = 'vetsync_cart';
 
@@ -10,120 +11,64 @@ interface Product {
   name: string;
   category: string;
   price: number;
-  originalPrice?: number;
-  rating: number;
-  reviews: number;
-  image: string;
-  badge?: 'Nuevo' | 'Oferta' | 'Popular';
+  originalPrice?: number; // Simularemos esto en el frontend para mantener el badge
+  rating?: number; // Simulado
+  reviews?: number; // Simulado
+  image_url: string;
+  badge?: 'Nuevo' | 'Oferta' | 'Popular'; // Calculado
   description: string;
+  stock_quantity?: number;
 }
 
-const products: Product[] = [
-  {
-    id: '1',
-    name: 'Alimento Premium Royal Canin Adult',
-    category: 'Alimentos',
-    price: 450,
-    originalPrice: 520,
-    rating: 4.8,
-    reviews: 124,
-    image: 'https://images.unsplash.com/photo-1589924691995-400dc9ecc119?w=400&auto=format&fit=crop',
-    badge: 'Oferta',
-    description: 'Nutrición completa y balanceada para perros adultos.'
-  },
-  {
-    id: '2',
-    name: 'Antipulgas Frontline Plus',
-    category: 'Medicamentos',
-    price: 280,
-    rating: 4.9,
-    reviews: 89,
-    image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&auto=format&fit=crop',
-    badge: 'Popular',
-    description: 'Protección contra pulgas y garrapatas por 1 mes.'
-  },
-  {
-    id: '3',
-    name: 'Collar Antiparasitario Seresto',
-    category: 'Accesorios',
-    price: 650,
-    rating: 4.7,
-    reviews: 56,
-    image: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400&auto=format&fit=crop',
-    badge: 'Nuevo',
-    description: 'Protección continua por hasta 8 meses contra pulgas.'
-  },
-  {
-    id: '4',
-    name: 'Shampoo Medicado para Perros',
-    category: 'Higiene',
-    price: 185,
-    originalPrice: 220,
-    rating: 4.5,
-    reviews: 43,
-    image: 'https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?w=400&auto=format&fit=crop',
-    badge: 'Oferta',
-    description: 'Fórmula dermatológica para piel sensible.'
-  },
-  {
-    id: '5',
-    name: 'Alimento Húmedo Gato Whiskas',
-    category: 'Alimentos',
-    price: 95,
-    rating: 4.3,
-    reviews: 201,
-    image: 'https://images.unsplash.com/photo-1606214174585-fe31582dc6ee?w=400&auto=format&fit=crop',
-    description: 'Sachets de sabores variados para gatos adultos.'
-  },
-  {
-    id: '6',
-    name: 'Cama Ortopédica para Mascotas',
-    category: 'Accesorios',
-    price: 890,
-    rating: 4.6,
-    reviews: 31,
-    image: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=400&auto=format&fit=crop',
-    badge: 'Nuevo',
-    description: 'Espuma de memoria para descanso óptimo.'
-  },
-  {
-    id: '7',
-    name: 'Vitaminas y Suplementos Caninos',
-    category: 'Medicamentos',
-    price: 320,
-    rating: 4.7,
-    reviews: 67,
-    image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=400&auto=format&fit=crop',
-    description: 'Complejo vitamínico para articulaciones y pelaje.'
-  },
-  {
-    id: '8',
-    name: 'Juguete Interactivo Kong Classic',
-    category: 'Juguetes',
-    price: 210,
-    originalPrice: 250,
-    rating: 4.9,
-    reviews: 178,
-    image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&auto=format&fit=crop',
-    badge: 'Popular',
-    description: 'Juguete rellenable para estimulación mental.'
-  },
-];
+// Productos cargados dinámicamente
 
 const categories = ['Todos', 'Alimentos', 'Medicamentos', 'Accesorios', 'Higiene', 'Juguetes'];
 
 export default function Tienda() {
+  const supabase = createClient();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [searchQuery, setSearchQuery] = useState('');
   const [cart, setCart] = useState<{id: string; qty: number}[]>([]);
   const [sortBy, setSortBy] = useState('popular');
 
-  // Cargar carrito desde localStorage al montar
+  // Cargar carrito desde localStorage al montar y obtener productos
   useEffect(() => {
     try {
       const saved = localStorage.getItem(CART_KEY);
       if (saved) setCart(JSON.parse(saved));
     } catch {}
+
+    async function fetchProducts() {
+      const { data, error } = await supabase.from('products').select('*');
+      if (!error && data) {
+        // Simulamos el rating y reviews basándonos en el ID o contenido para que se vea igual de bien que el mockup
+        const mappedProducts = data.map((p, index) => {
+          let badge: 'Nuevo' | 'Oferta' | 'Popular' | undefined;
+          let originalPrice: number | undefined;
+          
+          if (index % 3 === 0) badge = 'Oferta';
+          else if (index % 4 === 0) badge = 'Nuevo';
+          else if (index % 2 === 0) badge = 'Popular';
+
+          if (badge === 'Oferta') {
+            originalPrice = Math.round(p.price * 1.2); // 20% descuento aprox
+          }
+
+          return {
+            ...p,
+            rating: 4 + (Math.random()), // Entre 4 y 5
+            reviews: 20 + Math.floor(Math.random() * 200),
+            badge,
+            originalPrice
+          };
+        });
+        setProducts(mappedProducts);
+      }
+      setLoading(false);
+    }
+    fetchProducts();
   }, []);
 
   const addToCart = (productId: string) => {
@@ -150,9 +95,17 @@ export default function Tienda() {
     .sort((a, b) => {
       if (sortBy === 'price-asc') return a.price - b.price;
       if (sortBy === 'price-desc') return b.price - a.price;
-      if (sortBy === 'rating') return b.rating - a.rating;
-      return b.reviews - a.reviews; // popular
+      if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
+      return (b.reviews || 0) - (a.reviews || 0); // popular
     });
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   const getBadgeStyle = (badge?: string) => {
     switch (badge) {
@@ -252,7 +205,7 @@ export default function Tienda() {
               {/* Imagen */}
               <div className="relative h-48 overflow-hidden bg-surface-container-low">
                 <img
-                  src={product.image}
+                  src={product.image_url}
                   alt={product.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
@@ -278,8 +231,8 @@ export default function Tienda() {
                 <div className="flex items-center gap-1.5 mb-4">
                   <div className="flex">
                     {[1,2,3,4,5].map(star => (
-                      <span key={star} className={`material-symbols-outlined text-[14px] ${star <= Math.round(product.rating) ? 'text-amber-400' : 'text-outline-variant'}`}
-                        style={{ fontVariationSettings: star <= Math.round(product.rating) ? "'FILL' 1" : undefined }}>
+                      <span key={star} className={`material-symbols-outlined text-[14px] ${star <= Math.round(product.rating || 5) ? 'text-amber-400' : 'text-outline-variant'}`}
+                        style={{ fontVariationSettings: star <= Math.round(product.rating || 5) ? "'FILL' 1" : undefined }}>
                         star
                       </span>
                     ))}
