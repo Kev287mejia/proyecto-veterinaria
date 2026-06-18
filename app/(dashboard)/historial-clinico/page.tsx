@@ -1,9 +1,27 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createClient } from '@/utils/supabase/client';
 
 export default function HistorialClinico() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+        if (profile) setUserRole(profile.role);
+      }
+    };
+    fetchUserRole();
+  }, []);
   return (
     <div className="space-y-8 pb-12">
       {/* Hero Pet Profile Section */}
@@ -47,13 +65,15 @@ export default function HistorialClinico() {
           </div>
         </div>
         <div className="flex flex-col gap-2 w-full md:w-auto z-10">
-          <button 
-            onClick={() => setIsModalOpen(true)}
-            className="w-full px-6 py-2.5 bg-primary text-on-primary rounded-xl text-sm font-semibold flex items-center justify-center gap-2 hover:bg-primary-container transition-all shadow-sm active:scale-95"
-          >
-            <span className="material-symbols-outlined text-[20px]">add</span>
-            Nueva Consulta
-          </button>
+          {userRole !== 'CLIENTE' && (
+            <button 
+              onClick={() => setIsModalOpen(true)}
+              className="w-full px-6 py-2.5 bg-primary text-on-primary rounded-xl text-sm font-semibold flex items-center justify-center gap-2 hover:bg-primary-container transition-all shadow-sm active:scale-95"
+            >
+              <span className="material-symbols-outlined text-[20px]">add</span>
+              Nueva Consulta
+            </button>
+          )}
           <button className="w-full px-6 py-2.5 border border-outline-variant text-on-surface-variant rounded-xl text-sm font-semibold flex items-center justify-center gap-2 hover:bg-surface-container-low transition-all active:scale-95">
             <span className="material-symbols-outlined text-[20px]">print</span>
             Exportar PDF
@@ -182,13 +202,15 @@ export default function HistorialClinico() {
               </div>
             </div>
             
-            <div className="bg-surface-container-low p-4 px-6 flex justify-between items-center border-t border-outline-variant">
-              <span className="text-xs font-semibold text-on-surface-variant flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">history</span> Editado hace 2 horas</span>
-              <div className="flex gap-3 ml-auto">
-                <button className="px-5 py-2 border border-outline-variant rounded-xl text-sm font-bold hover:bg-white transition-all active:scale-95 shadow-sm">Editar Nota</button>
-                <button className="px-5 py-2 bg-secondary text-on-secondary rounded-xl text-sm font-bold hover:bg-secondary-fixed-dim transition-all active:scale-95 shadow-sm">Enviar a Cliente</button>
+            {userRole !== 'CLIENTE' && (
+              <div className="bg-surface-container-low p-4 px-6 flex justify-between items-center border-t border-outline-variant">
+                <span className="text-xs font-semibold text-on-surface-variant flex items-center gap-1"><span className="material-symbols-outlined text-[16px]">history</span> Editado hace 2 horas</span>
+                <div className="flex gap-3 ml-auto">
+                  <button className="px-5 py-2 border border-outline-variant rounded-xl text-sm font-bold hover:bg-white transition-all active:scale-95 shadow-sm">Editar Nota</button>
+                  <button className="px-5 py-2 bg-secondary text-on-secondary rounded-xl text-sm font-bold hover:bg-secondary-fixed-dim transition-all active:scale-95 shadow-sm">Enviar a Cliente</button>
+                </div>
               </div>
-            </div>
+            )}
           </article>
         </section>
       </div>
