@@ -207,7 +207,7 @@ export default function Tienda() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          {(userProfile?.role === 'vet' || userProfile?.role === 'admin') && (
+          {userProfile?.role === 'vet' && (
             <button onClick={handleOpenAdd} className="bg-primary text-on-primary px-4 py-3 rounded-2xl flex items-center gap-2 font-bold hover:shadow-md transition-all hover:scale-[1.02] active:scale-[0.98]">
               <span className="material-symbols-outlined">add</span>
               <span className="hidden sm:inline">Añadir Producto</span>
