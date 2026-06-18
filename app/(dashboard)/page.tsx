@@ -49,7 +49,7 @@ export default async function Dashboard() {
       {profile?.role === 'vet' ? (
         <VetDashboard />
       ) : (
-        <OwnerDashboard />
+        <OwnerDashboard userId={user!.id} />
       )}
     </>
   );

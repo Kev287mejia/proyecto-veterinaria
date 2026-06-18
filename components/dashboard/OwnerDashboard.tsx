@@ -1,6 +1,35 @@
 import Link from 'next/link';
+import { createClient } from '@/utils/supabase/server';
 
-export default function OwnerDashboard() {
+function calculateAge(birthDateStr: string | null): string {
+  if (!birthDateStr) return 'Desconocida';
+  const birth = new Date(birthDateStr);
+  const now = new Date();
+  let years = now.getFullYear() - birth.getFullYear();
+  let months = now.getMonth() - birth.getMonth();
+  if (months < 0) {
+    years--;
+    months += 12;
+  }
+  if (years > 0) return `${years} año${years !== 1 ? 's' : ''}`;
+  if (months > 0) return `${months} mes${months !== 1 ? 'es' : ''}`;
+  return 'Menos de 1 mes';
+}
+
+export default async function OwnerDashboard({ userId }: { userId: string }) {
+  const supabase = await createClient();
+
+  const { data: petsData } = await supabase.from('pets').select('*').eq('owner_id', userId).limit(3);
+  const pets = petsData || [];
+
+  const { data: apptsData } = await supabase.from('appointments')
+    .select('id, appointment_date, reason, status, clinic:vet_clinics!vet_id(clinic_name), pet:pets(name)')
+    .eq('owner_id', userId)
+    .in('status', ['pending', 'confirmed'])
+    .gte('appointment_date', new Date().toISOString())
+    .order('appointment_date', { ascending: true })
+    .limit(3);
+  const appointments = apptsData || [];
   return (
     <>
       {/* Mis Mascotas Section */}
@@ -17,33 +46,26 @@ export default function OwnerDashboard() {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
-          {/* Pet Card 1 */}
-          <div className="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant hover:shadow-md transition-all group flex gap-4 items-center">
-            <div className="w-16 h-16 rounded-full bg-surface-variant overflow-hidden border-2 border-primary-container shrink-0">
-              <img src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=200&auto=format&fit=crop" alt="Beagle" className="w-full h-full object-cover" />
+          {pets.length === 0 ? (
+            <div className="col-span-full p-8 text-center bg-surface-container-lowest rounded-xl border border-dashed border-outline-variant">
+              <p className="text-on-surface-variant mb-2">No tienes mascotas registradas.</p>
             </div>
-            <div className="flex-1">
-              <h3 className="font-title-md text-title-md text-primary">Max</h3>
-              <p className="text-body-sm text-on-surface-variant">Beagle • 3 años</p>
-            </div>
-            <button className="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container-low">
-              <span className="material-symbols-outlined">chevron_right</span>
-            </button>
-          </div>
-          
-          {/* Pet Card 2 */}
-          <div className="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant hover:shadow-md transition-all group flex gap-4 items-center">
-            <div className="w-16 h-16 rounded-full bg-surface-variant overflow-hidden border-2 border-secondary-container shrink-0">
-              <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=200&auto=format&fit=crop" alt="Gato Siamés" className="w-full h-full object-cover" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-title-md text-title-md text-primary">Luna</h3>
-              <p className="text-body-sm text-on-surface-variant">Siamés • 1 año</p>
-            </div>
-            <button className="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container-low">
-              <span className="material-symbols-outlined">chevron_right</span>
-            </button>
-          </div>
+          ) : (
+            pets.map(pet => (
+              <Link href={`/mascotas`} key={pet.id} className="bg-surface-container-lowest p-5 rounded-xl border border-outline-variant hover:shadow-md transition-all group flex gap-4 items-center">
+                <div className="w-16 h-16 rounded-full bg-surface-variant overflow-hidden border-2 border-primary-container shrink-0">
+                  <img src={pet.avatar_url || 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=200&auto=format&fit=crop'} alt={pet.name} className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-title-md text-title-md text-primary">{pet.name}</h3>
+                  <p className="text-body-sm text-on-surface-variant">{pet.breed || pet.species} • {calculateAge(pet.birth_date)}</p>
+                </div>
+                <button className="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container-low">
+                  <span className="material-symbols-outlined">chevron_right</span>
+                </button>
+              </Link>
+            ))
+          )}
         </div>
       </div>
       
@@ -57,45 +79,43 @@ export default function OwnerDashboard() {
           </div>
           
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 rounded-lg border border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors">
-              <div className="flex items-center gap-4">
-                <div className="bg-surface-container-lowest px-3 py-2 rounded-lg text-center shadow-sm">
-                  <p className="text-[12px] text-on-surface-variant font-bold uppercase">10:30</p>
-                  <p className="text-[14px] font-bold text-primary">AM</p>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="w-2 h-2 rounded-full bg-secondary"></span>
-                    <p className="text-body-sm font-semibold">Vacunación Múltiple</p>
+            {appointments.length === 0 ? (
+              <div className="p-6 text-center bg-surface-container-low rounded-lg border border-dashed border-outline-variant">
+                <p className="text-on-surface-variant text-sm">No tienes citas próximas agendadas.</p>
+              </div>
+            ) : (
+              appointments.map(appt => {
+                const date = new Date(appt.appointment_date);
+                const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const [timeStr, period] = timeString.split(' ');
+                
+                return (
+                  <div key={appt.id} className={`flex items-center justify-between p-4 rounded-lg border transition-colors ${appt.status === 'confirmed' ? 'border-primary/30 bg-primary/5 hover:bg-primary/10' : 'border-outline-variant hover:bg-surface-container-low'}`}>
+                    <div className="flex items-center gap-4">
+                      <div className="bg-surface-container-lowest px-3 py-2 rounded-lg text-center shadow-sm min-w-[70px]">
+                        <p className="text-[12px] text-on-surface-variant font-bold uppercase">{timeStr}</p>
+                        <p className="text-[14px] font-bold text-primary">{period || 'H'}</p>
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className={`w-2 h-2 rounded-full ${appt.status === 'confirmed' ? 'bg-secondary' : 'bg-surface-tint'}`}></span>
+                          <p className="text-body-sm font-semibold">{appt.reason}</p>
+                        </div>
+                        <p className="text-[12px] text-on-surface-variant">Para <b>{(appt.pet as any)?.name}</b> en <i>{(appt.clinic as any)?.clinic_name}</i></p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-1">
+                      {appt.status === 'confirmed' ? (
+                        <span className="px-2 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded">Confirmada</span>
+                      ) : (
+                        <span className="px-2 py-1 bg-surface-container-high text-on-surface-variant text-[10px] font-bold rounded">Pendiente</span>
+                      )}
+                      <span className="text-[11px] text-on-surface-variant">{date.toLocaleDateString()}</span>
+                    </div>
                   </div>
-                  <p className="text-[12px] text-on-surface-variant">Para <b>Max</b> en <i>Clínica VetSalud</i></p>
-                </div>
-              </div>
-              <div className="flex flex-col items-end gap-1">
-                <span className="px-2 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded">Confirmada</span>
-                <span className="text-[11px] text-on-surface-variant">Mañana</span>
-              </div>
-            </div>
-            
-            <div className="flex items-center justify-between p-4 rounded-lg border border-outline-variant hover:bg-surface-container-low transition-colors">
-              <div className="flex items-center gap-4">
-                <div className="bg-surface-container-low px-3 py-2 rounded-lg text-center">
-                  <p className="text-[12px] text-on-surface-variant font-bold uppercase">16:00</p>
-                  <p className="text-[14px] font-bold text-primary">PM</p>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="w-2 h-2 rounded-full bg-surface-tint"></span>
-                    <p className="text-body-sm font-semibold">Corte de uñas y baño</p>
-                  </div>
-                  <p className="text-[12px] text-on-surface-variant">Para <b>Luna</b> en <i>PetSpa Centro</i></p>
-                </div>
-              </div>
-              <div className="flex flex-col items-end gap-1">
-                <span className="text-[11px] font-medium text-primary">Ver detalles</span>
-                <span className="text-[11px] text-on-surface-variant">En 5 días</span>
-              </div>
-            </div>
+                );
+              })
+            )}
           </div>
           
           <Link 
@@ -108,35 +128,12 @@ export default function OwnerDashboard() {
         </div>
         
         {/* Recordatorios de Salud */}
-        <div className="lg:col-span-5 bg-surface-container-lowest p-6 rounded-xl border border-outline-variant">
-          <div className="flex justify-between items-center mb-6">
-            <h4 className="font-title-md text-title-md text-primary">Recordatorios de Salud</h4>
-          </div>
-          <div className="relative space-y-6 before:absolute before:left-[17px] before:top-2 before:bottom-2 before:w-[1px] before:bg-outline-variant">
-            
-            <div className="relative flex gap-4 items-start pl-9">
-              <div className="absolute left-0 top-1 w-9 h-9 rounded-full bg-surface border-2 border-error flex items-center justify-center z-10">
-                <span className="material-symbols-outlined text-error text-[18px]" data-icon="vaccines">vaccines</span>
-              </div>
-              <div>
-                <p className="text-body-sm font-semibold text-error">Vacuna Antirrábica</p>
-                <p className="text-[12px] text-on-surface-variant">Max necesita su refuerzo anual.</p>
-                <p className="text-[11px] font-bold text-error mt-1">Venció hace 2 días</p>
-              </div>
-            </div>
-            
-            <div className="relative flex gap-4 items-start pl-9">
-              <div className="absolute left-0 top-1 w-9 h-9 rounded-full bg-surface border-2 border-secondary flex items-center justify-center z-10">
-                <span className="material-symbols-outlined text-secondary text-[18px]" data-icon="medication">medication</span>
-              </div>
-              <div>
-                <p className="text-body-sm font-semibold">Desparasitación</p>
-                <p className="text-[12px] text-on-surface-variant">Próxima dosis para Luna.</p>
-                <p className="text-[11px] font-medium text-on-surface-variant mt-1">En 2 semanas</p>
-              </div>
-            </div>
-
-          </div>
+        <div className="lg:col-span-5 bg-surface-container-lowest p-6 rounded-xl border border-outline-variant flex flex-col items-center justify-center text-center">
+          <span className="material-symbols-outlined text-[48px] text-outline-variant mb-4" data-icon="construction">construction</span>
+          <h4 className="font-title-md text-title-md text-primary mb-2">Recordatorios de Salud</h4>
+          <p className="text-body-sm text-on-surface-variant max-w-xs mx-auto">
+            Próximamente podrás visualizar el calendario de vacunas y recordatorios clínicos de tus mascotas aquí.
+          </p>
         </div>
         
         {/* Acceso Rápido / Servicios */}
