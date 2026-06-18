@@ -2,13 +2,35 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { createClient } from '@/utils/supabase/client';
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const supabase = createClient();
+  const [userRole, setUserRole] = useState<'ADMIN' | 'VETERINARIO' | 'CLIENTE'>('CLIENTE');
 
-  // TODO: Reemplazar con el rol real del usuario desde tu sistema de autenticación
-  // Cambia esto a 'ADMIN', 'VETERINARIO' o 'CLIENTE' para probar
-  const userRole: 'ADMIN' | 'VETERINARIO' | 'CLIENTE' = 'CLIENTE';
+  useEffect(() => {
+    async function loadUserRole() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+      if (profile?.role === 'admin') {
+        setUserRole('ADMIN');
+      } else if (profile?.role === 'vet') {
+        setUserRole('VETERINARIO');
+      } else {
+        setUserRole('CLIENTE');
+      }
+    }
+    loadUserRole();
+  }, []);
 
   const isActive = (path: string) => {
     if (path === '/') {
