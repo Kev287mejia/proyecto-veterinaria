@@ -13,7 +13,7 @@ interface ClientPet {
 interface ClientProfile {
   id: string;
   full_name: string;
-  phone_number: string | null;
+  phone: string | null;
   role: string;
   pets: ClientPet[];
 }
@@ -50,7 +50,7 @@ export default function Clientes() {
         // Fetch clients and their pets
         const { data: clientsData, error } = await supabase
           .from('profiles')
-          .select('id, full_name, phone_number, role, pets(id, name, breed)')
+          .select('id, full_name, phone, role, pets(id, name, breed)')
           .eq('role', 'owner')
           .order('full_name', { ascending: true });
 
@@ -71,7 +71,7 @@ export default function Clientes() {
 
   const filteredClients = clients.filter(c => 
     (c.full_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (c.phone_number || '').includes(searchQuery)
+    (c.phone || '').includes(searchQuery)
   );
 
   // Array de colores pasteles para los avatares
@@ -148,7 +148,7 @@ export default function Clientes() {
                       </h3>
                       <div className="flex items-center gap-1.5 mt-1 text-on-surface-variant text-sm">
                         <span className="material-symbols-outlined text-[16px]">call</span>
-                        <span>{client.phone_number || 'Sin número'}</span>
+                        <span>{client.phone || 'Sin número'}</span>
                       </div>
                     </div>
                   </div>
