@@ -74,7 +74,7 @@ export default function Sidebar() {
           <span className="font-label-md text-label-md">Mascotas</span>
         </Link>
         {userRole !== 'CLIENTE' && (
-          <Link className={getLinkClass('/clientes')} href="#">
+          <Link className={getLinkClass('/clientes')} href="/clientes">
             <span className="material-symbols-outlined" data-icon="group">group</span>
             <span className="font-label-md text-label-md">Clientes</span>
           </Link>
