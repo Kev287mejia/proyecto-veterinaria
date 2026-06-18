@@ -84,6 +84,7 @@ export default function Mascotas() {
   const [newAge, setNewAge] = useState('');
   const [newWeight, setNewWeight] = useState('');
   const [newStatus, setNewStatus] = useState<'Saludable' | 'En Observación' | 'En Tratamiento' | 'Crítico'>('Saludable');
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   // Pets state
   const [pets, setPets] = useState<Pet[]>([]);
@@ -178,12 +179,27 @@ export default function Mascotas() {
 
     setSubmitting(true);
 
-    // Use a default placeholder image based on species
     let image = 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400';
     if (newSpecies === 'Felinos') {
       image = 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=400';
     } else if (newSpecies === 'Exóticos') {
       image = 'https://images.unsplash.com/photo-1507666480287-c11226b9f27d?w=400';
+    }
+
+    if (avatarFile) {
+      const fileExt = avatarFile.name.split('.').pop();
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `${currentUser.id}/${fileName}`;
+      
+      const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, avatarFile);
+      
+      if (!uploadError) {
+        const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+        image = publicUrlData.publicUrl;
+      } else {
+        console.error('Error uploading image:', uploadError);
+        alert('Hubo un problema subiendo la imagen, pero la mascota será registrada con una imagen por defecto.');
+      }
     }
 
     const cleanWeight = parseFloat(newWeight.replace(/[^\d.]/g, '')) || 0;
@@ -237,6 +253,7 @@ export default function Mascotas() {
     setNewAge('');
     setNewWeight('');
     setNewStatus('Saludable');
+    setAvatarFile(null);
     setIsAddModalOpen(false);
   };
 
@@ -528,7 +545,10 @@ export default function Mascotas() {
             <div className="flex justify-between items-center mb-6">
               <h3 className="font-bold text-2xl text-primary">Registrar Nueva Mascota</h3>
               <button
-                onClick={() => setIsAddModalOpen(false)}
+                onClick={() => {
+                  setIsAddModalOpen(false);
+                  setAvatarFile(null);
+                }}
                 className="p-1 hover:bg-surface-container-high rounded-full text-on-surface-variant transition-colors"
               >
                 <span className="material-symbols-outlined">close</span>
@@ -619,10 +639,28 @@ export default function Mascotas() {
                 </select>
               </div>
 
+              <div>
+                <label className="block text-sm font-semibold text-on-surface mb-1.5" htmlFor="photo">Foto de la Mascota (Opcional)</label>
+                <input
+                  id="photo"
+                  type="file"
+                  accept="image/png, image/jpeg, image/jpg, image/webp"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      setAvatarFile(e.target.files[0]);
+                    }
+                  }}
+                  className="w-full px-4 py-2.5 rounded-lg border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none text-sm text-on-surface cursor-pointer"
+                />
+              </div>
+
               <div className="flex gap-3 justify-end pt-4">
                 <button
                   type="button"
-                  onClick={() => setIsAddModalOpen(false)}
+                  onClick={() => {
+                    setIsAddModalOpen(false);
+                    setAvatarFile(null);
+                  }}
                   className="px-5 py-2.5 border border-outline-variant hover:bg-surface-container-low rounded-xl text-sm font-semibold transition-all cursor-pointer"
                 >
                   Cancelar
