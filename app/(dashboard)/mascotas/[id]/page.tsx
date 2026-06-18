@@ -3,8 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
-export default function PetDetails({ params }: { params: { id: string } }) {
+export default function PetDetails() {
+  const params = useParams();
+  const id = params?.id as string;
+
   const supabase = createClient();
   const [loading, setLoading] = useState(true);
   const [pet, setPet] = useState<any>(null);
@@ -12,13 +16,14 @@ export default function PetDetails({ params }: { params: { id: string } }) {
   const [vaccinations, setVaccinations] = useState<any[]>([]);
 
   useEffect(() => {
+    if (!id) return;
     async function loadPetData() {
       try {
         // Fetch pet details
         const { data: petData, error: petError } = await supabase
           .from('pets')
           .select('*, owner:profiles!owner_id(full_name)')
-          .eq('id', params.id)
+          .eq('id', id)
           .single();
 
         if (petError) throw petError;
@@ -28,7 +33,7 @@ export default function PetDetails({ params }: { params: { id: string } }) {
         const { data: recordsData } = await supabase
           .from('medical_records')
           .select('*, clinic:vet_clinics(clinic_name)')
-          .eq('pet_id', params.id)
+          .eq('pet_id', id)
           .order('record_date', { ascending: false });
         
         if (recordsData) setMedicalRecords(recordsData);
@@ -37,7 +42,7 @@ export default function PetDetails({ params }: { params: { id: string } }) {
         const { data: vaxData } = await supabase
           .from('vaccinations')
           .select('*, clinic:vet_clinics(clinic_name)')
-          .eq('pet_id', params.id)
+          .eq('pet_id', id)
           .order('administered_date', { ascending: false });
 
         if (vaxData) setVaccinations(vaxData);
@@ -48,7 +53,7 @@ export default function PetDetails({ params }: { params: { id: string } }) {
       }
     }
     loadPetData();
-  }, [params.id]);
+  }, [id]);
 
   function calculateAge(birthDateStr: string | null): string {
     if (!birthDateStr) return 'Edad desc.';
