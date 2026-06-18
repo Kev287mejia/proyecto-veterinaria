@@ -10,7 +10,8 @@ export default function Header() {
   const router = useRouter();
   const [displayName, setDisplayName] = useState('');
   const [roleLabel, setRoleLabel] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState('');
+  // Avatar por defecto: mascota DiceBear (se actualiza con el email real al cargar)
+  const [avatarUrl, setAvatarUrl] = useState('https://api.dicebear.com/9.x/thumbs/svg?seed=default&backgroundColor=b6e3f4&shapeColor=0a5b83');
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -86,8 +87,8 @@ export default function Header() {
           >
             <img
               alt="Perfil"
-              className="w-8 h-8 rounded-full object-cover border border-outline-variant"
-              src={avatarUrl || 'https://i.pravatar.cc/150?u=default'}
+              className="w-8 h-8 rounded-full object-cover border border-outline-variant bg-surface-container-low"
+              src={avatarUrl}
             />
             <div className="hidden md:flex flex-col text-left">
               <span className="font-label-md font-bold text-on-surface text-sm leading-tight">
