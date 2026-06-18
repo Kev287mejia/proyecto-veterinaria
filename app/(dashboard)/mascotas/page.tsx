@@ -400,7 +400,7 @@ export default function Mascotas() {
                   <p className="font-semibold text-xs text-on-surface">{pet.weight}</p>
                 </div>
               </div>
-              <Link href="/historial-clinico" className="block text-center mt-6 w-full py-2 border border-outline-variant hover:border-primary hover:text-primary rounded-xl text-sm font-semibold transition-all cursor-pointer">
+              <Link href={`/mascotas/${pet.id}`} className="block text-center mt-6 w-full py-2 border border-outline-variant hover:border-primary hover:text-primary rounded-xl text-sm font-semibold transition-all cursor-pointer">
                 Ver Historial
               </Link>
             </div>
@@ -449,7 +449,7 @@ export default function Mascotas() {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <Link href="/historial-clinico" className="px-4 py-1.5 border border-outline-variant hover:border-primary hover:text-primary rounded-lg text-sm font-semibold transition-all cursor-pointer">
+                    <Link href={`/mascotas/${pet.id}`} className="px-4 py-1.5 border border-outline-variant hover:border-primary hover:text-primary rounded-lg text-sm font-semibold transition-all cursor-pointer">
                       Ver Historial
                     </Link>
                   </td>
@@ -461,9 +461,10 @@ export default function Mascotas() {
       )}
 
       {/* CRM Recent Activity & Reminders Section */}
-      <div className="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
-          <h4 className="font-bold text-xl text-primary mb-6">Altas Recientes</h4>
+      {profile?.role === 'vet' && (
+        <div className="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <h4 className="font-bold text-xl text-primary mb-6">Altas Recientes</h4>
           <div className="bg-surface-container-lowest rounded-2xl overflow-hidden border border-outline-variant/60 shadow-sm">
             <table className="w-full text-left">
               <thead>
@@ -518,6 +519,7 @@ export default function Mascotas() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Add Pet Modal */}
       {isAddModalOpen && (
