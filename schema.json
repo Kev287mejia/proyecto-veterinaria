@@ -1,0 +1,2903 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "",
+    "title": "standard public schema",
+    "version": "14.5"
+  },
+  "host": "djrpiqwcrpdtoqzyekug.supabase.co:443",
+  "basePath": "/",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json",
+    "application/vnd.pgrst.object+json;nulls=stripped",
+    "application/vnd.pgrst.object+json",
+    "text/csv"
+  ],
+  "produces": [
+    "application/json",
+    "application/vnd.pgrst.object+json;nulls=stripped",
+    "application/vnd.pgrst.object+json",
+    "text/csv"
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "produces": [
+          "application/openapi+json",
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "OpenAPI description (this document)",
+        "tags": [
+          "Introspection"
+        ]
+      }
+    },
+    "/vaccines": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.vaccines.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccines.pet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccines.vet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccines.name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccines.date_administered"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccines.next_due_date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccines.notes"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccines.created_at"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/order"
+          },
+          {
+            "$ref": "#/parameters/range"
+          },
+          {
+            "$ref": "#/parameters/rangeUnit"
+          },
+          {
+            "$ref": "#/parameters/offset"
+          },
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/preferCount"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/vaccines"
+              },
+              "type": "array"
+            }
+          },
+          "206": {
+            "description": "Partial Content"
+          }
+        },
+        "tags": [
+          "vaccines"
+        ]
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/body.vaccines"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/preferPost"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "vaccines"
+        ]
+      },
+      "delete": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.vaccines.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccines.pet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccines.vet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccines.name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccines.date_administered"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccines.next_due_date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccines.notes"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccines.created_at"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "vaccines"
+        ]
+      },
+      "patch": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.vaccines.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccines.pet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccines.vet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccines.name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccines.date_administered"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccines.next_due_date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccines.notes"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccines.created_at"
+          },
+          {
+            "$ref": "#/parameters/body.vaccines"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "vaccines"
+        ]
+      }
+    },
+    "/orders": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.orders.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.orders.user_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.orders.status"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.orders.total_amount"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.orders.created_at"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/order"
+          },
+          {
+            "$ref": "#/parameters/range"
+          },
+          {
+            "$ref": "#/parameters/rangeUnit"
+          },
+          {
+            "$ref": "#/parameters/offset"
+          },
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/preferCount"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/orders"
+              },
+              "type": "array"
+            }
+          },
+          "206": {
+            "description": "Partial Content"
+          }
+        },
+        "tags": [
+          "orders"
+        ]
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/body.orders"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/preferPost"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "orders"
+        ]
+      },
+      "delete": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.orders.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.orders.user_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.orders.status"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.orders.total_amount"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.orders.created_at"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "orders"
+        ]
+      },
+      "patch": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.orders.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.orders.user_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.orders.status"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.orders.total_amount"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.orders.created_at"
+          },
+          {
+            "$ref": "#/parameters/body.orders"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "orders"
+        ]
+      }
+    },
+    "/profiles": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.profiles.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.role"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.full_name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.phone"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.avatar_url"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.created_at"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.updated_at"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.address"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/order"
+          },
+          {
+            "$ref": "#/parameters/range"
+          },
+          {
+            "$ref": "#/parameters/rangeUnit"
+          },
+          {
+            "$ref": "#/parameters/offset"
+          },
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/preferCount"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/profiles"
+              },
+              "type": "array"
+            }
+          },
+          "206": {
+            "description": "Partial Content"
+          }
+        },
+        "tags": [
+          "profiles"
+        ]
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/body.profiles"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/preferPost"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "profiles"
+        ]
+      },
+      "delete": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.profiles.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.role"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.full_name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.phone"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.avatar_url"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.created_at"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.updated_at"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.address"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "profiles"
+        ]
+      },
+      "patch": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.profiles.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.role"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.full_name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.phone"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.avatar_url"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.created_at"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.updated_at"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.address"
+          },
+          {
+            "$ref": "#/parameters/body.profiles"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "profiles"
+        ]
+      }
+    },
+    "/vet_clinics": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.vet_clinics.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vet_clinics.owner_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vet_clinics.clinic_name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vet_clinics.description"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vet_clinics.address"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vet_clinics.city"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vet_clinics.license_number"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vet_clinics.created_at"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/order"
+          },
+          {
+            "$ref": "#/parameters/range"
+          },
+          {
+            "$ref": "#/parameters/rangeUnit"
+          },
+          {
+            "$ref": "#/parameters/offset"
+          },
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/preferCount"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/vet_clinics"
+              },
+              "type": "array"
+            }
+          },
+          "206": {
+            "description": "Partial Content"
+          }
+        },
+        "tags": [
+          "vet_clinics"
+        ]
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/body.vet_clinics"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/preferPost"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "vet_clinics"
+        ]
+      },
+      "delete": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.vet_clinics.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vet_clinics.owner_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vet_clinics.clinic_name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vet_clinics.description"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vet_clinics.address"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vet_clinics.city"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vet_clinics.license_number"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vet_clinics.created_at"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "vet_clinics"
+        ]
+      },
+      "patch": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.vet_clinics.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vet_clinics.owner_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vet_clinics.clinic_name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vet_clinics.description"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vet_clinics.address"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vet_clinics.city"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vet_clinics.license_number"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vet_clinics.created_at"
+          },
+          {
+            "$ref": "#/parameters/body.vet_clinics"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "vet_clinics"
+        ]
+      }
+    },
+    "/appointments": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.appointments.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.pet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.vet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.owner_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.appointment_date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.reason"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.status"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.notes"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.created_at"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/order"
+          },
+          {
+            "$ref": "#/parameters/range"
+          },
+          {
+            "$ref": "#/parameters/rangeUnit"
+          },
+          {
+            "$ref": "#/parameters/offset"
+          },
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/preferCount"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/appointments"
+              },
+              "type": "array"
+            }
+          },
+          "206": {
+            "description": "Partial Content"
+          }
+        },
+        "tags": [
+          "appointments"
+        ]
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/body.appointments"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/preferPost"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "appointments"
+        ]
+      },
+      "delete": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.appointments.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.pet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.vet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.owner_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.appointment_date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.reason"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.status"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.notes"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.created_at"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "appointments"
+        ]
+      },
+      "patch": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.appointments.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.pet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.vet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.owner_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.appointment_date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.reason"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.status"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.notes"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.created_at"
+          },
+          {
+            "$ref": "#/parameters/body.appointments"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "appointments"
+        ]
+      }
+    },
+    "/medical_records": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.pet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.vet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.appointment_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.diagnosis"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.treatment"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.prescription"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.visit_date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.created_at"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/order"
+          },
+          {
+            "$ref": "#/parameters/range"
+          },
+          {
+            "$ref": "#/parameters/rangeUnit"
+          },
+          {
+            "$ref": "#/parameters/offset"
+          },
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/preferCount"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/medical_records"
+              },
+              "type": "array"
+            }
+          },
+          "206": {
+            "description": "Partial Content"
+          }
+        },
+        "tags": [
+          "medical_records"
+        ]
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/body.medical_records"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/preferPost"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "medical_records"
+        ]
+      },
+      "delete": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.pet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.vet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.appointment_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.diagnosis"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.treatment"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.prescription"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.visit_date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.created_at"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "medical_records"
+        ]
+      },
+      "patch": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.pet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.vet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.appointment_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.diagnosis"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.treatment"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.prescription"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.visit_date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.medical_records.created_at"
+          },
+          {
+            "$ref": "#/parameters/body.medical_records"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "medical_records"
+        ]
+      }
+    },
+    "/products": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.products.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.products.vet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.products.name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.products.description"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.products.price"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.products.stock_quantity"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.products.image_url"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.products.category"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.products.created_at"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/order"
+          },
+          {
+            "$ref": "#/parameters/range"
+          },
+          {
+            "$ref": "#/parameters/rangeUnit"
+          },
+          {
+            "$ref": "#/parameters/offset"
+          },
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/preferCount"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/products"
+              },
+              "type": "array"
+            }
+          },
+          "206": {
+            "description": "Partial Content"
+          }
+        },
+        "tags": [
+          "products"
+        ]
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/body.products"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/preferPost"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "products"
+        ]
+      },
+      "delete": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.products.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.products.vet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.products.name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.products.description"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.products.price"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.products.stock_quantity"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.products.image_url"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.products.category"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.products.created_at"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "products"
+        ]
+      },
+      "patch": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.products.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.products.vet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.products.name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.products.description"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.products.price"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.products.stock_quantity"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.products.image_url"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.products.category"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.products.created_at"
+          },
+          {
+            "$ref": "#/parameters/body.products"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "products"
+        ]
+      }
+    },
+    "/order_items": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.order_items.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.order_items.order_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.order_items.product_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.order_items.quantity"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.order_items.unit_price"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.order_items.created_at"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/order"
+          },
+          {
+            "$ref": "#/parameters/range"
+          },
+          {
+            "$ref": "#/parameters/rangeUnit"
+          },
+          {
+            "$ref": "#/parameters/offset"
+          },
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/preferCount"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/order_items"
+              },
+              "type": "array"
+            }
+          },
+          "206": {
+            "description": "Partial Content"
+          }
+        },
+        "tags": [
+          "order_items"
+        ]
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/body.order_items"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/preferPost"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "order_items"
+        ]
+      },
+      "delete": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.order_items.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.order_items.order_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.order_items.product_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.order_items.quantity"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.order_items.unit_price"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.order_items.created_at"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "order_items"
+        ]
+      },
+      "patch": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.order_items.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.order_items.order_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.order_items.product_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.order_items.quantity"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.order_items.unit_price"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.order_items.created_at"
+          },
+          {
+            "$ref": "#/parameters/body.order_items"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "order_items"
+        ]
+      }
+    },
+    "/vaccinations": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.vaccinations.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccinations.pet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccinations.vet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccinations.vaccine_name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccinations.administered_date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccinations.next_due_date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccinations.notes"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccinations.created_at"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/order"
+          },
+          {
+            "$ref": "#/parameters/range"
+          },
+          {
+            "$ref": "#/parameters/rangeUnit"
+          },
+          {
+            "$ref": "#/parameters/offset"
+          },
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/preferCount"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/vaccinations"
+              },
+              "type": "array"
+            }
+          },
+          "206": {
+            "description": "Partial Content"
+          }
+        },
+        "tags": [
+          "vaccinations"
+        ]
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/body.vaccinations"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/preferPost"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "vaccinations"
+        ]
+      },
+      "delete": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.vaccinations.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccinations.pet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccinations.vet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccinations.vaccine_name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccinations.administered_date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccinations.next_due_date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccinations.notes"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccinations.created_at"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "vaccinations"
+        ]
+      },
+      "patch": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.vaccinations.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccinations.pet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccinations.vet_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccinations.vaccine_name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccinations.administered_date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccinations.next_due_date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccinations.notes"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.vaccinations.created_at"
+          },
+          {
+            "$ref": "#/parameters/body.vaccinations"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "vaccinations"
+        ]
+      }
+    },
+    "/pets": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.pets.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.owner_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.species"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.breed"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.birth_date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.weight"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.medical_notes"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.avatar_url"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.created_at"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/order"
+          },
+          {
+            "$ref": "#/parameters/range"
+          },
+          {
+            "$ref": "#/parameters/rangeUnit"
+          },
+          {
+            "$ref": "#/parameters/offset"
+          },
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/preferCount"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/pets"
+              },
+              "type": "array"
+            }
+          },
+          "206": {
+            "description": "Partial Content"
+          }
+        },
+        "tags": [
+          "pets"
+        ]
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/body.pets"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/preferPost"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "pets"
+        ]
+      },
+      "delete": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.pets.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.owner_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.species"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.breed"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.birth_date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.weight"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.medical_notes"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.avatar_url"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.created_at"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "pets"
+        ]
+      },
+      "patch": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.pets.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.owner_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.species"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.breed"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.birth_date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.weight"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.medical_notes"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.avatar_url"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.pets.created_at"
+          },
+          {
+            "$ref": "#/parameters/body.pets"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "pets"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "vaccines": {
+      "required": [
+        "id",
+        "name",
+        "date_administered"
+      ],
+      "properties": {
+        "id": {
+          "default": "extensions.uuid_generate_v4()",
+          "description": "Note:\nThis is a Primary Key.<pk/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "pet_id": {
+          "description": "Note:\nThis is a Foreign Key to `pets.id`.<fk table='pets' column='id'/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "vet_id": {
+          "description": "Note:\nThis is a Foreign Key to `vet_clinics.id`.<fk table='vet_clinics' column='id'/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "name": {
+          "format": "character varying",
+          "maxLength": 255,
+          "type": "string"
+        },
+        "date_administered": {
+          "format": "date",
+          "type": "string"
+        },
+        "next_due_date": {
+          "format": "date",
+          "type": "string"
+        },
+        "notes": {
+          "format": "text",
+          "type": "string"
+        },
+        "created_at": {
+          "default": "timezone('utc'::text, now())",
+          "format": "timestamp with time zone",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "orders": {
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "default": "extensions.uuid_generate_v4()",
+          "description": "Note:\nThis is a Primary Key.<pk/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "user_id": {
+          "description": "Note:\nThis is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "status": {
+          "default": "cart",
+          "enum": [
+            "cart",
+            "pending_payment",
+            "paid",
+            "shipped",
+            "delivered",
+            "cancelled"
+          ],
+          "format": "public.order_status",
+          "type": "string"
+        },
+        "total_amount": {
+          "default": 0,
+          "format": "numeric",
+          "type": "number"
+        },
+        "created_at": {
+          "default": "now()",
+          "format": "timestamp with time zone",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "profiles": {
+      "required": [
+        "id",
+        "role"
+      ],
+      "properties": {
+        "id": {
+          "description": "Note:\nThis is a Primary Key.<pk/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "role": {
+          "default": "owner",
+          "enum": [
+            "owner",
+            "vet",
+            "admin"
+          ],
+          "format": "public.user_role",
+          "type": "string"
+        },
+        "full_name": {
+          "format": "text",
+          "type": "string"
+        },
+        "phone": {
+          "format": "text",
+          "type": "string"
+        },
+        "avatar_url": {
+          "format": "text",
+          "type": "string"
+        },
+        "created_at": {
+          "default": "now()",
+          "format": "timestamp with time zone",
+          "type": "string"
+        },
+        "updated_at": {
+          "default": "now()",
+          "format": "timestamp with time zone",
+          "type": "string"
+        },
+        "address": {
+          "format": "text",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "vet_clinics": {
+      "required": [
+        "id",
+        "clinic_name"
+      ],
+      "properties": {
+        "id": {
+          "default": "extensions.uuid_generate_v4()",
+          "description": "Note:\nThis is a Primary Key.<pk/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "owner_id": {
+          "description": "Note:\nThis is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "clinic_name": {
+          "format": "text",
+          "type": "string"
+        },
+        "description": {
+          "format": "text",
+          "type": "string"
+        },
+        "address": {
+          "format": "text",
+          "type": "string"
+        },
+        "city": {
+          "format": "text",
+          "type": "string"
+        },
+        "license_number": {
+          "format": "text",
+          "type": "string"
+        },
+        "created_at": {
+          "default": "now()",
+          "format": "timestamp with time zone",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "appointments": {
+      "required": [
+        "id",
+        "appointment_date",
+        "reason"
+      ],
+      "properties": {
+        "id": {
+          "default": "extensions.uuid_generate_v4()",
+          "description": "Note:\nThis is a Primary Key.<pk/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "pet_id": {
+          "description": "Note:\nThis is a Foreign Key to `pets.id`.<fk table='pets' column='id'/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "vet_id": {
+          "description": "Note:\nThis is a Foreign Key to `vet_clinics.id`.<fk table='vet_clinics' column='id'/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "owner_id": {
+          "description": "Note:\nThis is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "appointment_date": {
+          "format": "timestamp with time zone",
+          "type": "string"
+        },
+        "reason": {
+          "format": "text",
+          "type": "string"
+        },
+        "status": {
+          "default": "pending",
+          "enum": [
+            "pending",
+            "confirmed",
+            "cancelled",
+            "completed"
+          ],
+          "format": "public.appointment_status",
+          "type": "string"
+        },
+        "notes": {
+          "format": "text",
+          "type": "string"
+        },
+        "created_at": {
+          "default": "now()",
+          "format": "timestamp with time zone",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "medical_records": {
+      "required": [
+        "id",
+        "diagnosis"
+      ],
+      "properties": {
+        "id": {
+          "default": "extensions.uuid_generate_v4()",
+          "description": "Note:\nThis is a Primary Key.<pk/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "pet_id": {
+          "description": "Note:\nThis is a Foreign Key to `pets.id`.<fk table='pets' column='id'/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "vet_id": {
+          "description": "Note:\nThis is a Foreign Key to `vet_clinics.id`.<fk table='vet_clinics' column='id'/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "appointment_id": {
+          "description": "Note:\nThis is a Foreign Key to `appointments.id`.<fk table='appointments' column='id'/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "diagnosis": {
+          "format": "text",
+          "type": "string"
+        },
+        "treatment": {
+          "format": "text",
+          "type": "string"
+        },
+        "prescription": {
+          "format": "text",
+          "type": "string"
+        },
+        "visit_date": {
+          "default": "now()",
+          "format": "timestamp with time zone",
+          "type": "string"
+        },
+        "created_at": {
+          "default": "now()",
+          "format": "timestamp with time zone",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "products": {
+      "required": [
+        "id",
+        "name",
+        "price"
+      ],
+      "properties": {
+        "id": {
+          "default": "extensions.uuid_generate_v4()",
+          "description": "Note:\nThis is a Primary Key.<pk/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "vet_id": {
+          "description": "Note:\nThis is a Foreign Key to `vet_clinics.id`.<fk table='vet_clinics' column='id'/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "name": {
+          "format": "text",
+          "type": "string"
+        },
+        "description": {
+          "format": "text",
+          "type": "string"
+        },
+        "price": {
+          "format": "numeric",
+          "type": "number"
+        },
+        "stock_quantity": {
+          "default": 0,
+          "format": "integer",
+          "type": "integer"
+        },
+        "image_url": {
+          "format": "text",
+          "type": "string"
+        },
+        "category": {
+          "format": "text",
+          "type": "string"
+        },
+        "created_at": {
+          "default": "now()",
+          "format": "timestamp with time zone",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "order_items": {
+      "required": [
+        "id",
+        "quantity",
+        "unit_price"
+      ],
+      "properties": {
+        "id": {
+          "default": "extensions.uuid_generate_v4()",
+          "description": "Note:\nThis is a Primary Key.<pk/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "order_id": {
+          "description": "Note:\nThis is a Foreign Key to `orders.id`.<fk table='orders' column='id'/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "product_id": {
+          "description": "Note:\nThis is a Foreign Key to `products.id`.<fk table='products' column='id'/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "quantity": {
+          "default": 1,
+          "format": "integer",
+          "type": "integer"
+        },
+        "unit_price": {
+          "format": "numeric",
+          "type": "number"
+        },
+        "created_at": {
+          "default": "now()",
+          "format": "timestamp with time zone",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "vaccinations": {
+      "required": [
+        "id",
+        "vaccine_name"
+      ],
+      "properties": {
+        "id": {
+          "default": "gen_random_uuid()",
+          "description": "Note:\nThis is a Primary Key.<pk/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "pet_id": {
+          "description": "Note:\nThis is a Foreign Key to `pets.id`.<fk table='pets' column='id'/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "vet_id": {
+          "description": "Note:\nThis is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "vaccine_name": {
+          "format": "text",
+          "type": "string"
+        },
+        "administered_date": {
+          "default": "CURRENT_DATE",
+          "format": "date",
+          "type": "string"
+        },
+        "next_due_date": {
+          "format": "date",
+          "type": "string"
+        },
+        "notes": {
+          "format": "text",
+          "type": "string"
+        },
+        "created_at": {
+          "default": "now()",
+          "format": "timestamp with time zone",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "pets": {
+      "required": [
+        "id",
+        "name",
+        "species"
+      ],
+      "properties": {
+        "id": {
+          "default": "extensions.uuid_generate_v4()",
+          "description": "Note:\nThis is a Primary Key.<pk/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "owner_id": {
+          "description": "Note:\nThis is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "name": {
+          "format": "text",
+          "type": "string"
+        },
+        "species": {
+          "format": "text",
+          "type": "string"
+        },
+        "breed": {
+          "format": "text",
+          "type": "string"
+        },
+        "birth_date": {
+          "format": "date",
+          "type": "string"
+        },
+        "weight": {
+          "format": "numeric",
+          "type": "number"
+        },
+        "medical_notes": {
+          "format": "text",
+          "type": "string"
+        },
+        "avatar_url": {
+          "format": "text",
+          "type": "string"
+        },
+        "created_at": {
+          "default": "now()",
+          "format": "timestamp with time zone",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "parameters": {
+    "preferParams": {
+      "name": "Prefer",
+      "description": "Preference",
+      "required": false,
+      "in": "header",
+      "type": "string"
+    },
+    "preferReturn": {
+      "name": "Prefer",
+      "description": "Preference",
+      "required": false,
+      "enum": [
+        "return=representation",
+        "return=minimal",
+        "return=none"
+      ],
+      "in": "header",
+      "type": "string"
+    },
+    "preferCount": {
+      "name": "Prefer",
+      "description": "Preference",
+      "required": false,
+      "enum": [
+        "count=none"
+      ],
+      "in": "header",
+      "type": "string"
+    },
+    "preferPost": {
+      "name": "Prefer",
+      "description": "Preference",
+      "required": false,
+      "enum": [
+        "return=representation",
+        "return=minimal",
+        "return=none",
+        "resolution=ignore-duplicates",
+        "resolution=merge-duplicates"
+      ],
+      "in": "header",
+      "type": "string"
+    },
+    "select": {
+      "name": "select",
+      "description": "Filtering Columns",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "on_conflict": {
+      "name": "on_conflict",
+      "description": "On Conflict",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "order": {
+      "name": "order",
+      "description": "Ordering",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "range": {
+      "name": "Range",
+      "description": "Limiting and Pagination",
+      "required": false,
+      "in": "header",
+      "type": "string"
+    },
+    "rangeUnit": {
+      "name": "Range-Unit",
+      "description": "Limiting and Pagination",
+      "required": false,
+      "default": "items",
+      "in": "header",
+      "type": "string"
+    },
+    "offset": {
+      "name": "offset",
+      "description": "Limiting and Pagination",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "limit": {
+      "name": "limit",
+      "description": "Limiting and Pagination",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.vaccines": {
+      "name": "vaccines",
+      "description": "vaccines",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/vaccines"
+      }
+    },
+    "rowFilter.vaccines.id": {
+      "name": "id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.vaccines.pet_id": {
+      "name": "pet_id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.vaccines.vet_id": {
+      "name": "vet_id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.vaccines.name": {
+      "name": "name",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.vaccines.date_administered": {
+      "name": "date_administered",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.vaccines.next_due_date": {
+      "name": "next_due_date",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.vaccines.notes": {
+      "name": "notes",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.vaccines.created_at": {
+      "name": "created_at",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.orders": {
+      "name": "orders",
+      "description": "orders",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/orders"
+      }
+    },
+    "rowFilter.orders.id": {
+      "name": "id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.orders.user_id": {
+      "name": "user_id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.orders.status": {
+      "name": "status",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.orders.total_amount": {
+      "name": "total_amount",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.orders.created_at": {
+      "name": "created_at",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.profiles": {
+      "name": "profiles",
+      "description": "profiles",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/profiles"
+      }
+    },
+    "rowFilter.profiles.id": {
+      "name": "id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.profiles.role": {
+      "name": "role",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.profiles.full_name": {
+      "name": "full_name",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.profiles.phone": {
+      "name": "phone",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.profiles.avatar_url": {
+      "name": "avatar_url",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.profiles.created_at": {
+      "name": "created_at",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.profiles.updated_at": {
+      "name": "updated_at",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.profiles.address": {
+      "name": "address",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.vet_clinics": {
+      "name": "vet_clinics",
+      "description": "vet_clinics",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/vet_clinics"
+      }
+    },
+    "rowFilter.vet_clinics.id": {
+      "name": "id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.vet_clinics.owner_id": {
+      "name": "owner_id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.vet_clinics.clinic_name": {
+      "name": "clinic_name",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.vet_clinics.description": {
+      "name": "description",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.vet_clinics.address": {
+      "name": "address",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.vet_clinics.city": {
+      "name": "city",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.vet_clinics.license_number": {
+      "name": "license_number",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.vet_clinics.created_at": {
+      "name": "created_at",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.appointments": {
+      "name": "appointments",
+      "description": "appointments",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/appointments"
+      }
+    },
+    "rowFilter.appointments.id": {
+      "name": "id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.appointments.pet_id": {
+      "name": "pet_id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.appointments.vet_id": {
+      "name": "vet_id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.appointments.owner_id": {
+      "name": "owner_id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.appointments.appointment_date": {
+      "name": "appointment_date",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.appointments.reason": {
+      "name": "reason",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.appointments.status": {
+      "name": "status",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.appointments.notes": {
+      "name": "notes",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.appointments.created_at": {
+      "name": "created_at",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.medical_records": {
+      "name": "medical_records",
+      "description": "medical_records",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/medical_records"
+      }
+    },
+    "rowFilter.medical_records.id": {
+      "name": "id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.medical_records.pet_id": {
+      "name": "pet_id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.medical_records.vet_id": {
+      "name": "vet_id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.medical_records.appointment_id": {
+      "name": "appointment_id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.medical_records.diagnosis": {
+      "name": "diagnosis",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.medical_records.treatment": {
+      "name": "treatment",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.medical_records.prescription": {
+      "name": "prescription",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.medical_records.visit_date": {
+      "name": "visit_date",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.medical_records.created_at": {
+      "name": "created_at",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.products": {
+      "name": "products",
+      "description": "products",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/products"
+      }
+    },
+    "rowFilter.products.id": {
+      "name": "id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.products.vet_id": {
+      "name": "vet_id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.products.name": {
+      "name": "name",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.products.description": {
+      "name": "description",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.products.price": {
+      "name": "price",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.products.stock_quantity": {
+      "name": "stock_quantity",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.products.image_url": {
+      "name": "image_url",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.products.category": {
+      "name": "category",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.products.created_at": {
+      "name": "created_at",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.order_items": {
+      "name": "order_items",
+      "description": "order_items",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/order_items"
+      }
+    },
+    "rowFilter.order_items.id": {
+      "name": "id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.order_items.order_id": {
+      "name": "order_id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.order_items.product_id": {
+      "name": "product_id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.order_items.quantity": {
+      "name": "quantity",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.order_items.unit_price": {
+      "name": "unit_price",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.order_items.created_at": {
+      "name": "created_at",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.vaccinations": {
+      "name": "vaccinations",
+      "description": "vaccinations",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/vaccinations"
+      }
+    },
+    "rowFilter.vaccinations.id": {
+      "name": "id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.vaccinations.pet_id": {
+      "name": "pet_id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.vaccinations.vet_id": {
+      "name": "vet_id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.vaccinations.vaccine_name": {
+      "name": "vaccine_name",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.vaccinations.administered_date": {
+      "name": "administered_date",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.vaccinations.next_due_date": {
+      "name": "next_due_date",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.vaccinations.notes": {
+      "name": "notes",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.vaccinations.created_at": {
+      "name": "created_at",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.pets": {
+      "name": "pets",
+      "description": "pets",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/pets"
+      }
+    },
+    "rowFilter.pets.id": {
+      "name": "id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.pets.owner_id": {
+      "name": "owner_id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.pets.name": {
+      "name": "name",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.pets.species": {
+      "name": "species",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.pets.breed": {
+      "name": "breed",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.pets.birth_date": {
+      "name": "birth_date",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.pets.weight": {
+      "name": "weight",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.pets.medical_notes": {
+      "name": "medical_notes",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.pets.avatar_url": {
+      "name": "avatar_url",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.pets.created_at": {
+      "name": "created_at",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    }
+  },
+  "externalDocs": {
+    "description": "PostgREST Documentation",
+    "url": "https://postgrest.org/en/v14/references/api.html"
+  }
+}

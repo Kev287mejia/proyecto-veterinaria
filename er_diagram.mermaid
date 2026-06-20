@@ -1,0 +1,109 @@
+erDiagram
+  vaccines {
+    uuid id
+    uuid pet_id
+    uuid vet_id
+    character_varying name
+    date date_administered
+    date next_due_date
+    text notes
+    timestamp_with_time_zone created_at
+  }
+  orders {
+    uuid id
+    uuid user_id
+    public_order_status status
+    numeric total_amount
+    timestamp_with_time_zone created_at
+  }
+  profiles {
+    uuid id
+    public_user_role role
+    text full_name
+    text phone
+    text avatar_url
+    timestamp_with_time_zone created_at
+    timestamp_with_time_zone updated_at
+    text address
+  }
+  vet_clinics {
+    uuid id
+    uuid owner_id
+    text clinic_name
+    text description
+    text address
+    text city
+    text license_number
+    timestamp_with_time_zone created_at
+  }
+  appointments {
+    uuid id
+    uuid pet_id
+    uuid vet_id
+    uuid owner_id
+    timestamp_with_time_zone appointment_date
+    text reason
+    public_appointment_status status
+    text notes
+    timestamp_with_time_zone created_at
+  }
+  medical_records {
+    uuid id
+    uuid pet_id
+    uuid vet_id
+    uuid appointment_id
+    text diagnosis
+    text treatment
+    text prescription
+    timestamp_with_time_zone visit_date
+    timestamp_with_time_zone created_at
+  }
+  products {
+    uuid id
+    uuid vet_id
+    text name
+    text description
+    numeric price
+    integer stock_quantity
+    text image_url
+    text category
+    timestamp_with_time_zone created_at
+  }
+  order_items {
+    uuid id
+    uuid order_id
+    uuid product_id
+    integer quantity
+    numeric unit_price
+    timestamp_with_time_zone created_at
+  }
+  vaccinations {
+    uuid id
+    uuid pet_id
+    uuid vet_id
+    text vaccine_name
+    date administered_date
+    date next_due_date
+    text notes
+    timestamp_with_time_zone created_at
+  }
+  pets {
+    uuid id
+    uuid owner_id
+    text name
+    text species
+    text breed
+    date birth_date
+    numeric weight
+    text medical_notes
+    text avatar_url
+    timestamp_with_time_zone created_at
+  }
+
+  pets ||--o{ vaccines : "has"
+  pets ||--o{ appointments : "has"
+  pets ||--o{ medical_records : "has"
+  appointments ||--o{ medical_records : "has"
+  orders ||--o{ order_items : "has"
+  products ||--o{ order_items : "has"
+  pets ||--o{ vaccinations : "has"

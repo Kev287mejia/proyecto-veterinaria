@@ -7,10 +7,8 @@ const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXB
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 async function main() {
-  const { data: pets, error: petsError } = await supabase
-          .from('pets')
-          .select('*');
-  console.log('Pets Error:', petsError ? petsError.message : 'No error');
-  console.log('Pets Data:', pets);
+  const { data, error } = await supabase.from('pets').select('*');
+  console.log('Pets Data:', data);
+  console.log('Pets Error:', error ? error.message : 'No error');
 }
 main();

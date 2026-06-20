@@ -11,6 +11,9 @@ interface Clinic {
   license_number: string | null;
   created_at: string;
   owner_id: string | null;
+  description: string | null;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 export default function AdminClinics() {
@@ -28,7 +31,10 @@ export default function AdminClinics() {
     clinic_name: '',
     city: '',
     address: '',
-    license_number: ''
+    license_number: '',
+    description: '',
+    latitude: '',
+    longitude: ''
   });
 
   useEffect(() => {
@@ -58,6 +64,9 @@ export default function AdminClinics() {
             city: formData.city || null,
             address: formData.address || null,
             license_number: formData.license_number || null,
+            description: formData.description || null,
+            latitude: formData.latitude ? parseFloat(formData.latitude) : null,
+            longitude: formData.longitude ? parseFloat(formData.longitude) : null,
           }
         ])
         .select()
@@ -67,7 +76,7 @@ export default function AdminClinics() {
       
       setClinics([data, ...clinics]);
       setIsModalOpen(false);
-      setFormData({ clinic_name: '', city: '', address: '', license_number: '' });
+      setFormData({ clinic_name: '', city: '', address: '', license_number: '', description: '', latitude: '', longitude: '' });
       alert("Clínica registrada exitosamente.");
     } catch (error: any) {
       console.error("Error creating clinic:", error);
@@ -163,12 +172,23 @@ export default function AdminClinics() {
                   <span className="material-symbols-outlined text-[18px] text-tertiary shrink-0">location_on</span>
                   <span>{clinic.address ? `${clinic.address}${clinic.city ? `, ${clinic.city}` : ''}` : clinic.city || 'Ubicación no especificada'}</span>
                 </div>
+                {clinic.latitude && clinic.longitude && (
+                  <div className="flex items-center gap-2 text-sm text-on-surface">
+                    <span className="material-symbols-outlined text-[18px] text-tertiary shrink-0">explore</span>
+                    <span>Coord: {clinic.latitude.toFixed(4)}, {clinic.longitude.toFixed(4)}</span>
+                  </div>
+                )}
                 <div className="flex items-center gap-2 text-sm text-on-surface">
                   <span className="material-symbols-outlined text-[18px] text-tertiary shrink-0">badge</span>
                   <span>Licencia: {clinic.license_number || 'No registrada'}</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-on-surface">
-                  <span className="material-symbols-outlined text-[18px] text-tertiary shrink-0">calendar_today</span>
+                {clinic.description && (
+                  <div className="bg-surface-container-low p-3 rounded-2xl mt-3 text-xs text-on-surface-variant italic border border-outline-variant/30">
+                    "{clinic.description}"
+                  </div>
+                )}
+                <div className="flex items-center gap-2 text-[11px] text-on-surface-variant/80 pt-2 border-t border-outline-variant/30 mt-2">
+                  <span className="material-symbols-outlined text-[14px]">calendar_today</span>
                   <span>Registrada: {new Date(clinic.created_at).toLocaleDateString()}</span>
                 </div>
               </div>
@@ -219,7 +239,7 @@ export default function AdminClinics() {
                     value={formData.city}
                     onChange={(e) => setFormData({...formData, city: e.target.value})}
                     className="w-full bg-surface-container-low border border-outline-variant text-on-surface rounded-2xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                    placeholder="Ej. Madrid"
+                    placeholder="Ej. Puerto Cabezas"
                   />
                 </div>
                 <div className="space-y-2">
@@ -235,14 +255,49 @@ export default function AdminClinics() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-on-surface-variant ml-1">Dirección Completa</label>
+                <label className="text-sm font-medium text-on-surface-variant ml-1">Dirección Completa (por Referencias)</label>
                 <input
                   type="text"
                   value={formData.address}
                   onChange={(e) => setFormData({...formData, address: e.target.value})}
                   className="w-full bg-surface-container-low border border-outline-variant text-on-surface rounded-2xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                  placeholder="Ej. Av. Principal 123"
+                  placeholder="Ej. Frente a terminal vieja, 1 c al norte"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-on-surface-variant ml-1">Descripción de la Clínica</label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({...formData, description: e.target.value})}
+                  className="w-full bg-surface-container-low border border-outline-variant text-on-surface rounded-2xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all h-20 resize-none"
+                  placeholder="Servicios veterinarios, cirugías, farmacia, vacunas..."
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-on-surface-variant ml-1">Latitud</label>
+                  <input
+                    type="number"
+                    step="0.000001"
+                    value={formData.latitude}
+                    onChange={(e) => setFormData({...formData, latitude: e.target.value})}
+                    className="w-full bg-surface-container-low border border-outline-variant text-on-surface rounded-2xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                    placeholder="Ej. 14.0306"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-on-surface-variant ml-1">Longitud</label>
+                  <input
+                    type="number"
+                    step="0.000001"
+                    value={formData.longitude}
+                    onChange={(e) => setFormData({...formData, longitude: e.target.value})}
+                    className="w-full bg-surface-container-low border border-outline-variant text-on-surface rounded-2xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                    placeholder="Ej. -83.3858"
+                  />
+                </div>
               </div>
 
               <div className="flex gap-3 pt-4">

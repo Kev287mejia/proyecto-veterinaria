@@ -27,7 +27,7 @@ export default function Login() {
       setError(error.message);
       setLoading(false);
     } else {
-      router.push('/');
+      router.push('/dashboard');
       router.refresh();
     }
   };

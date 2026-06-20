@@ -1,0 +1,29 @@
+const fs = require('fs');
+const path = require('path');
+
+function searchDir(dir) {
+  const files = fs.readdirSync(dir);
+  for (const file of files) {
+    const fullPath = path.join(dir, file);
+    const stat = fs.statSync(fullPath);
+    if (stat.isDirectory()) {
+      if (file !== 'node_modules' && file !== '.next' && file !== '.git') {
+        searchDir(fullPath);
+      }
+    } else if (file.endsWith('.js') || file.endsWith('.ts') || file.endsWith('.tsx')) {
+      const content = fs.readFileSync(fullPath, 'utf8');
+      if (content.toLowerCase().includes('rey')) {
+        console.log(`Found 'rey' in: ${fullPath}`);
+        // print matching lines
+        const lines = content.split('\n');
+        lines.forEach((line, idx) => {
+          if (line.toLowerCase().includes('rey')) {
+            console.log(`  Line ${idx + 1}: ${line.trim()}`);
+          }
+        });
+      }
+    }
+  }
+}
+
+searchDir(path.join(__dirname, '..'));

@@ -58,11 +58,13 @@ export default function Sidebar({ isOpen = false, setIsOpen = (val: boolean) => 
         <img alt="Vetsync Logo" className="w-8 h-8 object-contain" src="/Vetsync_Logo.png" />
         <div className="flex flex-col">
           <span className="font-headline-lg text-[20px] font-bold text-primary leading-tight">Vetsync</span>
-          <span className="text-on-surface-variant text-[10px] uppercase tracking-wider font-semibold">Clínica Veterinaria</span>
+          <span className="text-on-surface-variant text-[10px] uppercase tracking-wider font-semibold">
+            {userRole === 'VETERINARIO' ? 'Clínica Veterinaria' : 'Portal de Mascotas'}
+          </span>
         </div>
       </div>
       <nav className="flex-1 space-y-1">
-        <Link className={getLinkClass('/')} href="/">
+        <Link className={getLinkClass('/dashboard')} href="/dashboard">
           <span className="material-symbols-outlined" data-icon="dashboard">dashboard</span>
           <span className="font-label-md text-label-md">Dashboard</span>
         </Link>
@@ -72,12 +74,18 @@ export default function Sidebar({ isOpen = false, setIsOpen = (val: boolean) => 
         </Link>
         <Link className={getLinkClass('/citas')} href="/citas">
           <span className="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
-          <span className="font-label-md text-label-md">Citas</span>
+          <span className="font-label-md text-label-md">{userRole === 'CLIENTE' ? 'Mis Citas' : 'Citas'}</span>
         </Link>
         <Link className={getLinkClass('/mascotas')} href="/mascotas">
           <span className="material-symbols-outlined" data-icon="pets">pets</span>
-          <span className="font-label-md text-label-md">Mascotas</span>
+          <span className="font-label-md text-label-md">{userRole === 'CLIENTE' ? 'Mis Mascotas' : 'Mascotas'}</span>
         </Link>
+        {userRole === 'CLIENTE' && (
+          <Link className={getLinkClass('/directorio')} href="/directorio">
+            <span className="material-symbols-outlined" data-icon="location_on">location_on</span>
+            <span className="font-label-md text-label-md">Directorio (Mapa)</span>
+          </Link>
+        )}
         {userRole === 'VETERINARIO' && (
           <Link className={getLinkClass('/clientes')} href="/clientes">
             <span className="material-symbols-outlined" data-icon="group">group</span>

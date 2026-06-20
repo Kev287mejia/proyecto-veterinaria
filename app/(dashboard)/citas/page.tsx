@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
 interface Appointment {
@@ -39,7 +40,21 @@ interface ClinicOption {
 }
 
 export default function Citas() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+      </div>
+    }>
+      <CitasContent />
+    </Suspense>
+  );
+}
+
+function CitasContent() {
   const supabase = createClient();
+  const searchParams = useSearchParams();
+  const preselectedClinicId = searchParams.get('clinicId');
 
   // Page States
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -87,7 +102,10 @@ export default function Citas() {
           .select('id, clinic_name');
         if (clinicsData) {
           setClinics(clinicsData);
-          if (clinicsData.length > 0) {
+          if (preselectedClinicId) {
+            setFormClinicId(preselectedClinicId);
+            setIsAddModalOpen(true);
+          } else if (clinicsData.length > 0) {
             setFormClinicId(clinicsData[0].id);
           }
         }
@@ -97,12 +115,35 @@ export default function Citas() {
         if (userProfile?.role === 'owner') {
           petsQuery = petsQuery.eq('owner_id', user.id);
         }
-        const { data: petsData } = await petsQuery;
+        let { data: petsData, error: petsError } = await petsQuery;
+        
+        console.log("CITAS - USER PROFILE:", userProfile);
+        console.log("CITAS - PETS DATA (Primary):", petsData);
+        console.log("CITAS - PETS ERROR (Primary):", petsError);
+
+        // Fallback: If primary query fails or returns null due to RLS/join issues, try a simple select without join
+        if (petsError || !petsData) {
+          console.warn("Primary query failed or returned no data, executing fallback query...");
+          let fallbackQuery = supabase.from('pets').select('id, name, owner_id');
+          if (userProfile?.role === 'owner') {
+            fallbackQuery = fallbackQuery.eq('owner_id', user.id);
+          }
+          const { data: fallbackData, error: fallbackError } = await fallbackQuery;
+          
+          console.log("CITAS - PETS DATA (Fallback):", fallbackData);
+          console.log("CITAS - PETS ERROR (Fallback):", fallbackError);
+          
+          if (!fallbackError && fallbackData) {
+            petsData = fallbackData as any;
+            petsError = null;
+          }
+        }
+
         if (petsData) {
           const mappedPets = petsData.map((p: any) => ({
             id: p.id,
             name: p.name,
-            owner_name: p.owner?.full_name,
+            owner_name: p.owner?.full_name || 'Dueño',
             owner_id: p.owner_id
           }));
           setMyPets(mappedPets);
