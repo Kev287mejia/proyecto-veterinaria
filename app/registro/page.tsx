@@ -100,7 +100,7 @@ export default function Registro() {
               className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary focus:border-primary transition-colors outline-none text-on-surface" 
               id="name" 
               type="text" 
-              placeholder="Juan Pérez"
+              placeholder="Kevin Mejía"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -124,7 +124,7 @@ export default function Registro() {
               className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary focus:border-primary transition-colors outline-none text-on-surface" 
               id="phone" 
               type="tel" 
-              placeholder="+504 1234-5678"
+              placeholder="+505 8123 4567"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               required
@@ -136,7 +136,7 @@ export default function Registro() {
               className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary focus:border-primary transition-colors outline-none text-on-surface" 
               id="address" 
               type="text" 
-              placeholder="Col. Miraflores, Bloque 4, Casa 12"
+              placeholder="Barrio Peter Ferrera, del Muelle 2c al Norte"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               required

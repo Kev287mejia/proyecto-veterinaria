@@ -264,7 +264,7 @@ export default function Perfil() {
                   id="phone" 
                   type="tel" 
                   value={phone}
-                  placeholder="+504 1234-5678"
+                  placeholder="+505 8123 4567"
                   onChange={(e) => setPhone(e.target.value)}
                 />
               </div>
@@ -276,7 +276,7 @@ export default function Perfil() {
                   id="address" 
                   type="text" 
                   value={address}
-                  placeholder="Tu dirección completa"
+                  placeholder="Barrio Peter Ferrera, del Muelle 2c al Norte"
                   onChange={(e) => setAddress(e.target.value)}
                 />
               </div>
