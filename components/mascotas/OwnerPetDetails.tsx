@@ -42,7 +42,7 @@ export default function OwnerPetDetails({ petId }: { petId: string }) {
           .from('medical_records')
           .select('*, clinic:vet_clinics(clinic_name)')
           .eq('pet_id', petId)
-          .order('record_date', { ascending: false });
+          .order('visit_date', { ascending: false });
         
         if (recordsData) setMedicalRecords(recordsData);
 
@@ -185,7 +185,7 @@ export default function OwnerPetDetails({ petId }: { petId: string }) {
                   <div className="absolute left-0 top-0 bottom-0 w-2 bg-primary"></div>
                   <div className="flex justify-between items-start mb-4">
                     <span className="text-xs font-bold text-primary bg-primary-container px-3 py-1.5 rounded-full">
-                      {new Date(record.record_date || record.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })}
+                      {new Date(record.visit_date || record.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })}
                     </span>
                     {record.clinic?.clinic_name && (
                       <span className="text-xs font-bold text-on-surface-variant flex items-center gap-1 bg-surface-container px-3 py-1.5 rounded-full">
@@ -199,9 +199,15 @@ export default function OwnerPetDetails({ petId }: { petId: string }) {
                     <p className="text-on-surface font-semibold bg-surface-container-low p-3 rounded-xl">{record.diagnosis}</p>
                   </div>
                   {record.treatment && (
+                    <div className="mb-4">
+                      <h4 className="text-sm font-bold text-on-surface uppercase tracking-wider mb-1">Tratamiento</h4>
+                      <p className="text-on-surface font-medium bg-surface-container-low p-3 rounded-xl">{record.treatment}</p>
+                    </div>
+                  )}
+                  {record.prescription && (
                     <div>
                       <h4 className="text-sm font-bold text-secondary uppercase tracking-wider mb-1">Receta / Indicaciones</h4>
-                      <p className="text-on-surface font-medium bg-secondary-container/20 p-3 rounded-xl border border-secondary/20">{record.treatment}</p>
+                      <p className="text-on-surface font-medium bg-secondary-container/20 p-3 rounded-xl border border-secondary/20">{record.prescription}</p>
                     </div>
                   )}
                 </div>

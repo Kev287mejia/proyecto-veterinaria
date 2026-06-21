@@ -25,6 +25,7 @@ export default function VetPetDetails({ petId, vetId }: { petId: string, vetId: 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [medicalRecords, setMedicalRecords] = useState<any[]>([]);
   const [vaccinations, setVaccinations] = useState<any[]>([]);
+  const [activeClinicId, setActiveClinicId] = useState<string | null>(null);
   
   const [showMedModal, setShowMedModal] = useState(false);
   const [medForm, setMedForm] = useState({ diagnosis: '', treatment: '', notes: '' });
@@ -50,7 +51,7 @@ export default function VetPetDetails({ petId, vetId }: { petId: string, vetId: 
           .from('medical_records')
           .select('*, clinic:vet_clinics(clinic_name)')
           .eq('pet_id', petId)
-          .order('record_date', { ascending: false });
+          .order('visit_date', { ascending: false });
         
         if (recordsData) setMedicalRecords(recordsData);
 
@@ -61,6 +62,16 @@ export default function VetPetDetails({ petId, vetId }: { petId: string, vetId: 
           .order('date_administered', { ascending: false });
 
         if (vaxData) setVaccinations(vaxData);
+
+        // Buscar clínica de este veterinario (owner_id = vetId o current user id)
+        const { data: clinicsData } = await supabase
+          .from('vet_clinics')
+          .select('id')
+          .eq('owner_id', vetId);
+        
+        if (clinicsData && clinicsData.length > 0) {
+          setActiveClinicId(clinicsData[0].id);
+        }
       } catch (err: any) {
         console.error('Error fetching pet details:', err);
         setErrorMsg(err?.message || JSON.stringify(err));
@@ -69,20 +80,21 @@ export default function VetPetDetails({ petId, vetId }: { petId: string, vetId: 
       }
     }
     loadPetData();
-  }, [petId, supabase]);
+  }, [petId, vetId, supabase]);
 
   const handleAddMedRecord = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!medForm.diagnosis) return;
     setIsSubmittingMed(true);
     try {
+      const clinicIdToUse = activeClinicId || vetId; // Si no hay clínica, cae a vetId
       const { data, error } = await supabase.from('medical_records').insert({
         pet_id: petId,
-        vet_id: vetId,
+        vet_id: clinicIdToUse,
         diagnosis: medForm.diagnosis,
-        treatment: medForm.treatment,
-        notes: medForm.notes,
-        record_date: new Date().toISOString()
+        treatment: medForm.treatment || null,
+        prescription: medForm.notes || null,
+        visit_date: new Date().toISOString()
       }).select('*, clinic:vet_clinics(clinic_name)').single();
       
       if (error) throw error;
@@ -91,8 +103,9 @@ export default function VetPetDetails({ petId, vetId }: { petId: string, vetId: 
         setShowMedModal(false);
         setMedForm({ diagnosis: '', treatment: '', notes: '' });
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error adding medical record:', err);
+      alert('Error al guardar el registro clínico: ' + err.message);
     } finally {
       setIsSubmittingMed(false);
     }
@@ -103,9 +116,10 @@ export default function VetPetDetails({ petId, vetId }: { petId: string, vetId: 
     if (!vaxForm.name) return;
     setIsSubmittingVax(true);
     try {
+      const clinicIdToUse = activeClinicId || vetId;
       const { data, error } = await supabase.from('vaccines').insert({
         pet_id: petId,
-        vet_id: vetId,
+        vet_id: clinicIdToUse,
         name: vaxForm.name,
         date_administered: vaxForm.date_administered || new Date().toISOString().split('T')[0],
         next_due_date: vaxForm.next_due_date || null
@@ -117,8 +131,9 @@ export default function VetPetDetails({ petId, vetId }: { petId: string, vetId: 
         setShowVaxModal(false);
         setVaxForm({ name: '', date_administered: new Date().toISOString().split('T')[0], next_due_date: '' });
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error adding vaccine:', err);
+      alert('Error al agregar la vacuna: ' + err.message);
     } finally {
       setIsSubmittingVax(false);
     }
@@ -221,7 +236,7 @@ export default function VetPetDetails({ petId, vetId }: { petId: string, vetId: 
                   <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-primary rounded-l-2xl"></div>
                   <div className="flex justify-between items-start mb-3">
                     <span className="text-xs font-bold text-on-surface-variant bg-surface-container px-3 py-1 rounded-full">
-                      {new Date(record.record_date || record.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })}
+                      {new Date(record.visit_date || record.created_at).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })}
                     </span>
                     {record.clinic?.clinic_name && (
                       <span className="text-xs font-semibold text-primary flex items-center gap-1">
@@ -238,10 +253,10 @@ export default function VetPetDetails({ petId, vetId }: { petId: string, vetId: 
                     <h4 className="text-sm font-bold text-on-surface uppercase tracking-wider mb-1">Tratamiento</h4>
                     <p className="text-on-surface-variant text-sm">{record.treatment}</p>
                   </div>
-                  {record.notes && (
+                  {record.prescription && (
                     <div className="mt-4 pt-4 border-t border-outline-variant/30">
-                      <h4 className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Notas del Veterinario</h4>
-                      <p className="text-on-surface-variant text-sm italic">{record.notes}</p>
+                      <h4 className="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Notas del Veterinario / Receta</h4>
+                      <p className="text-on-surface-variant text-sm italic">{record.prescription}</p>
                     </div>
                   )}
                 </div>

@@ -89,6 +89,14 @@ function CitasContent() {
   const [reviewHoverRating, setReviewHoverRating] = useState(0);
   const [savingReview, setSavingReview] = useState(false);
 
+  // Registrar Consulta Médica (Finalizar Cita) States
+  const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
+  const [selectedApptForCompletion, setSelectedApptForCompletion] = useState<Appointment | null>(null);
+  const [consultationDiagnosis, setConsultationDiagnosis] = useState('');
+  const [consultationTreatment, setConsultationTreatment] = useState('');
+  const [consultationPrescription, setConsultationPrescription] = useState('');
+  const [savingConsultation, setSavingConsultation] = useState(false);
+
   // Load appointments, clinics, and pets
   useEffect(() => {
     async function loadData() {
@@ -325,6 +333,71 @@ function CitasContent() {
       } else {
          console.log("No owner phone found for this appointment");
       }
+    }
+  };
+
+  // Completion / Medical Consultation handlers
+  const handleOpenCompleteModal = (appt: Appointment) => {
+    setSelectedApptForCompletion(appt);
+    setConsultationDiagnosis('');
+    setConsultationTreatment('');
+    setConsultationPrescription('');
+    setIsCompleteModalOpen(true);
+  };
+
+  const handleConfirmCompletion = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedApptForCompletion || !currentUser) return;
+    if (!consultationDiagnosis.trim()) {
+      alert('Por favor, ingresa el diagnóstico.');
+      return;
+    }
+
+    setSavingConsultation(true);
+
+    try {
+      const clinicId = selectedApptForCompletion.clinic?.id;
+      const petId = selectedApptForCompletion.pet?.id;
+
+      if (!clinicId || !petId) {
+        throw new Error('Falta información de la clínica o de la mascota para registrar la consulta.');
+      }
+
+      // 1. Insertar en `medical_records`
+      const { error: recordError } = await supabase
+        .from('medical_records')
+        .insert({
+          pet_id: petId,
+          vet_id: clinicId,
+          appointment_id: selectedApptForCompletion.id,
+          diagnosis: consultationDiagnosis,
+          treatment: consultationTreatment || null,
+          prescription: consultationPrescription || null,
+          visit_date: new Date().toISOString()
+        });
+
+      if (recordError) throw recordError;
+
+      // 2. Actualizar cita a 'completed'
+      const { error: apptError } = await supabase
+        .from('appointments')
+        .update({ status: 'completed' })
+        .eq('id', selectedApptForCompletion.id);
+
+      if (apptError) throw apptError;
+
+      // 3. Actualizar lista local
+      setAppointments(appointments.map(appt => 
+        appt.id === selectedApptForCompletion.id ? { ...appt, status: 'completed' } : appt
+      ));
+
+      setIsCompleteModalOpen(false);
+      setSelectedApptForCompletion(null);
+    } catch (err: any) {
+      console.error('Error al finalizar consulta:', err);
+      alert('Error al registrar la consulta: ' + (err.message || err));
+    } finally {
+      setSavingConsultation(false);
     }
   };
 
@@ -664,9 +737,9 @@ function CitasContent() {
                         )}
                         {appt.status === 'confirmed' && (profile?.role === 'vet' || profile?.role === 'admin') && (
                           <button 
-                            onClick={() => handleUpdateStatus(appt.id, 'completed')}
+                            onClick={() => handleOpenCompleteModal(appt)}
                             className="p-1 hover:bg-surface-container-high rounded text-primary transition-colors"
-                            title="Finalizar Consulta"
+                            title="Finalizar Consulta / Registrar Diagnóstico"
                           >
                             <span className="material-symbols-outlined text-base">task_alt</span>
                           </button>
@@ -955,6 +1028,94 @@ function CitasContent() {
                     <span className="material-symbols-outlined text-[16px]">save</span>
                   )}
                   {userReviews[selectedApptForReview.id] ? 'Guardar' : 'Calificar'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Registrar Consulta Médica (Finalizar Cita) */}
+      {isCompleteModalOpen && selectedApptForCompletion && (
+        <div className="fixed inset-0 bg-primary/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="glass-card w-full max-w-lg p-8 rounded-2xl shadow-xl border border-outline-variant/60 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-bold text-2xl text-primary flex items-center gap-2">
+                <span className="material-symbols-outlined">medical_information</span>
+                Registrar Consulta Médica
+              </h3>
+              <button
+                onClick={() => setIsCompleteModalOpen(false)}
+                className="p-1 hover:bg-surface-container-high rounded-full text-on-surface-variant transition-colors"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div className="mb-4 bg-surface-container-low p-4 rounded-xl space-y-1">
+              <p className="text-xs text-on-surface-variant uppercase font-bold tracking-wider">Información del Paciente</p>
+              <p className="text-sm font-bold text-on-surface">Mascota: {selectedApptForCompletion.pet?.name || 'Desconocido'}</p>
+              <p className="text-xs text-on-surface-variant">Dueño: {selectedApptForCompletion.owner?.full_name || 'Desconocido'}</p>
+              <p className="text-xs text-on-surface-variant">Motivo: {selectedApptForCompletion.reason}</p>
+            </div>
+
+            <form onSubmit={handleConfirmCompletion} className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-on-surface mb-1.5" htmlFor="diagnosis">Diagnóstico <span className="text-error">*</span></label>
+                <input
+                  id="diagnosis"
+                  type="text"
+                  required
+                  placeholder="Ej: Infección de oído medio"
+                  value={consultationDiagnosis}
+                  onChange={(e) => setConsultationDiagnosis(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-lg border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none text-sm text-on-surface"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-on-surface mb-1.5" htmlFor="treatment">Tratamiento</label>
+                <input
+                  id="treatment"
+                  type="text"
+                  placeholder="Ej: Limpieza diaria y gotas de Otomax"
+                  value={consultationTreatment}
+                  onChange={(e) => setConsultationTreatment(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-lg border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none text-sm text-on-surface"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-on-surface mb-1.5" htmlFor="prescription">Receta / Notas Adicionales</label>
+                <textarea
+                  id="prescription"
+                  placeholder="Prescripción detallada, dosificación u otras indicaciones médicas..."
+                  value={consultationPrescription}
+                  onChange={(e) => setConsultationPrescription(e.target.value)}
+                  rows={4}
+                  className="w-full px-4 py-2.5 rounded-lg border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none text-sm text-on-surface resize-none"
+                />
+              </div>
+
+              <div className="flex gap-3 justify-end pt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsCompleteModalOpen(false)}
+                  className="px-5 py-2.5 border border-outline-variant hover:bg-surface-container-low rounded-xl text-sm font-semibold transition-all cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingConsultation || !consultationDiagnosis.trim()}
+                  className="px-5 py-2.5 bg-primary hover:bg-primary-container text-on-primary rounded-xl text-sm font-semibold shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                >
+                  {savingConsultation ? (
+                    <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                  ) : (
+                    <span className="material-symbols-outlined text-[18px]">check_circle</span>
+                  )}
+                  Guardar y Finalizar Cita
                 </button>
               </div>
             </form>
