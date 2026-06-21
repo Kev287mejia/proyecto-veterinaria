@@ -182,13 +182,13 @@ export default async function LandingPage() {
 
       {/* FOOTER */}
       <footer className="w-full bg-gray-900 text-gray-400 py-16 px-6 mt-auto">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 relative opacity-90 brightness-200">
+        <div className="max-w-7xl mx-auto flex flex-col items-center text-center gap-8">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-14 h-14 relative opacity-90 brightness-200">
               <Image src="/Vetsync_Logo.png" alt="Vetsync Logo" fill className="object-contain" />
             </div>
             <div>
-              <span className="text-lg font-bold text-white tracking-tight block">Vetsync Bilwi</span>
+              <span className="text-xl font-bold text-white tracking-tight block mb-1">Vetsync Bilwi</span>
               <span className="text-sm">Cuidando a las mascotas del Caribe Norte</span>
             </div>
           </div>
