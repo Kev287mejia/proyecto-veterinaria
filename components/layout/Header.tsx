@@ -15,13 +15,15 @@ export default function Header({ onOpenSidebar = () => {} }: { onOpenSidebar?: (
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
+    let channel: any;
+
     async function loadUser() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('full_name, role')
+        .select('full_name, role, avatar_url')
         .eq('id', user.id)
         .single();
 
@@ -40,12 +42,38 @@ export default function Header({ onOpenSidebar = () => {} }: { onOpenSidebar?: (
       setDisplayName(name);
       setRoleLabel(profile?.role === 'vet' ? 'Veterinario' : 'Dueño de Mascota');
 
-      // Avatar: mascota única generada por DiceBear basada en el email del usuario
-      const seed = encodeURIComponent(user.email ?? 'default');
-      setAvatarUrl(`https://api.dicebear.com/9.x/thumbs/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc&shapeColor=0a5b83,1c799f,69d2e7`);
+      // Avatar: usar avatar_url si existe, sino DiceBear
+      if (profile?.avatar_url) {
+        setAvatarUrl(profile.avatar_url);
+      } else {
+        const seed = encodeURIComponent(user.email ?? 'default');
+        setAvatarUrl(`https://api.dicebear.com/9.x/thumbs/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc&shapeColor=0a5b83,1c799f,69d2e7`);
+      }
+
+      // Escuchar cambios en el perfil (como nueva foto de perfil)
+      channel = supabase.channel('custom-header-channel')
+        .on(
+          'postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user.id}` },
+          (payload) => {
+            if (payload.new.avatar_url) {
+              setAvatarUrl(payload.new.avatar_url);
+            }
+            if (payload.new.full_name) {
+              setDisplayName(payload.new.full_name);
+            }
+          }
+        )
+        .subscribe();
     }
     loadUser();
-  }, []);
+
+    return () => {
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
+    };
+  }, [supabase]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
