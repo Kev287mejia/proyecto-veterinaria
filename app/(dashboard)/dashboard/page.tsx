@@ -47,7 +47,7 @@ export default async function Dashboard() {
       </div>
       
       {profile?.role === 'vet' ? (
-        <VetDashboard />
+        <VetDashboard userId={user!.id} />
       ) : (
         <OwnerDashboard userId={user!.id} />
       )}
