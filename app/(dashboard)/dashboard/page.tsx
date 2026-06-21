@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation';
 import VetDashboard from '@/components/dashboard/VetDashboard';
 import OwnerDashboard from '@/components/dashboard/OwnerDashboard';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Dashboard() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
