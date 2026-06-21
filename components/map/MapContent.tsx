@@ -25,6 +25,8 @@ interface Clinic {
   description: string;
   latitude: number | null;
   longitude: number | null;
+  avgRating?: number;
+  reviewCount?: number;
 }
 
 export default function MapContent({ clinics }: { clinics: Clinic[] }) {
@@ -64,6 +66,20 @@ export default function MapContent({ clinics }: { clinics: Clinic[] }) {
                       <span className="material-symbols-outlined text-[16px]">local_hospital</span>
                       {clinic.clinic_name}
                     </h3>
+                    
+                    {clinic.reviewCount !== undefined && clinic.reviewCount > 0 ? (
+                      <div className="flex items-center gap-1 text-xs mb-1.5">
+                        <span className="material-symbols-outlined text-[14px] text-amber-500" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                        <span className="font-bold text-on-surface">{clinic.avgRating}</span>
+                        <span className="text-on-surface-variant font-medium">({clinic.reviewCount} {clinic.reviewCount === 1 ? 'reseña' : 'reseñas'})</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1 text-[11px] text-on-surface-variant/80 mb-1.5 font-medium">
+                        <span className="material-symbols-outlined text-[14px]">star</span>
+                        <span>Sin calificaciones</span>
+                      </div>
+                    )}
+                    
                     <p className="text-xs text-on-surface-variant font-semibold mb-2">{clinic.city}</p>
                     
                     <div className="bg-surface-container-low p-2 rounded-lg mb-2">

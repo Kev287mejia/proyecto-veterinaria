@@ -80,6 +80,15 @@ function CitasContent() {
   const [formReason, setFormReason] = useState('');
   const [formNotes, setFormNotes] = useState('');
 
+  // Reviews States
+  const [userReviews, setUserReviews] = useState<Record<string, any>>({});
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [selectedApptForReview, setSelectedApptForReview] = useState<Appointment | null>(null);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [reviewHoverRating, setReviewHoverRating] = useState(0);
+  const [savingReview, setSavingReview] = useState(false);
+
   // Load appointments, clinics, and pets
   useEffect(() => {
     async function loadData() {
@@ -95,6 +104,21 @@ function CitasContent() {
           .eq('id', user.id)
           .single();
         setProfile(userProfile);
+
+        // Load Owner's reviews
+        if (userProfile?.role === 'owner') {
+          const { data: reviewsData, error: reviewsError } = await supabase
+            .from('reviews')
+            .select('id, appointment_id, rating, comment')
+            .eq('owner_id', user.id);
+          if (!reviewsError && reviewsData) {
+            const revMap: Record<string, any> = {};
+            reviewsData.forEach((rev: any) => {
+              revMap[rev.appointment_id] = rev;
+            });
+            setUserReviews(revMap);
+          }
+        }
 
         // Load Clinics
         const { data: clinicsData } = await supabase
@@ -301,6 +325,100 @@ function CitasContent() {
       } else {
          console.log("No owner phone found for this appointment");
       }
+    }
+  };
+
+  // Reviews handlers
+  const handleOpenReviewModal = (appt: Appointment) => {
+    setSelectedApptForReview(appt);
+    const existingReview = userReviews[appt.id];
+    if (existingReview) {
+      setReviewRating(existingReview.rating);
+      setReviewComment(existingReview.comment || '');
+    } else {
+      setReviewRating(5);
+      setReviewComment('');
+    }
+    setReviewHoverRating(0);
+    setIsReviewModalOpen(true);
+  };
+
+  const handleSaveReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedApptForReview || !currentUser) return;
+    
+    setSavingReview(true);
+    const existingReview = userReviews[selectedApptForReview.id];
+    const reviewData = {
+      appointment_id: selectedApptForReview.id,
+      owner_id: currentUser.id,
+      clinic_id: selectedApptForReview.clinic?.id,
+      rating: reviewRating,
+      comment: reviewComment || null
+    };
+
+    let error;
+    let savedData;
+
+    if (existingReview) {
+      // Update
+      const { data, error: updateError } = await supabase
+        .from('reviews')
+        .update({
+          rating: reviewRating,
+          comment: reviewComment || null
+        })
+        .eq('id', existingReview.id)
+        .select()
+        .single();
+      error = updateError;
+      savedData = data;
+    } else {
+      // Insert
+      const { data, error: insertError } = await supabase
+        .from('reviews')
+        .insert(reviewData)
+        .select()
+        .single();
+      error = insertError;
+      savedData = data;
+    }
+
+    setSavingReview(false);
+
+    if (error) {
+      console.error('Error saving review:', error);
+      alert('Error al guardar la reseña: ' + error.message);
+    } else {
+      setUserReviews(prev => ({
+        ...prev,
+        [selectedApptForReview.id]: savedData
+      }));
+      setIsReviewModalOpen(false);
+    }
+  };
+
+  const handleDeleteReview = async (apptId: string) => {
+    const existingReview = userReviews[apptId];
+    if (!existingReview) return;
+    
+    if (!confirm('¿Estás seguro de que deseas eliminar esta reseña?')) return;
+
+    const { error } = await supabase
+      .from('reviews')
+      .delete()
+      .eq('id', existingReview.id);
+
+    if (error) {
+      console.error('Error deleting review:', error);
+      alert('Error al eliminar la reseña: ' + error.message);
+    } else {
+      setUserReviews(prev => {
+        const copy = { ...prev };
+        delete copy[apptId];
+        return copy;
+      });
+      setIsReviewModalOpen(false);
     }
   };
 
@@ -544,6 +662,15 @@ function CitasContent() {
                             <span className="material-symbols-outlined text-base">check_circle</span>
                           </button>
                         )}
+                        {appt.status === 'confirmed' && (profile?.role === 'vet' || profile?.role === 'admin') && (
+                          <button 
+                            onClick={() => handleUpdateStatus(appt.id, 'completed')}
+                            className="p-1 hover:bg-surface-container-high rounded text-primary transition-colors"
+                            title="Finalizar Consulta"
+                          >
+                            <span className="material-symbols-outlined text-base">task_alt</span>
+                          </button>
+                        )}
                         {appt.status !== 'cancelled' && appt.status !== 'completed' && (
                           <button 
                             onClick={() => handleUpdateStatus(appt.id, 'cancelled')}
@@ -554,6 +681,45 @@ function CitasContent() {
                           </button>
                         )}
                       </div>
+                      {appt.status === 'completed' && profile?.role === 'owner' && (
+                        userReviews[appt.id] ? (
+                          <div className="mt-1 flex flex-col items-end gap-1">
+                            <div className="flex items-center gap-0.5">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <span 
+                                  key={star} 
+                                  className={`material-symbols-outlined text-[14px] ${star <= userReviews[appt.id].rating ? 'text-amber-400' : 'text-outline-variant'}`}
+                                  style={{ fontVariationSettings: star <= userReviews[appt.id].rating ? "'FILL' 1" : undefined }}
+                                >
+                                  star
+                                </span>
+                              ))}
+                            </div>
+                            <div className="flex gap-2 mt-0.5">
+                              <button 
+                                onClick={() => handleOpenReviewModal(appt)}
+                                className="text-[10px] font-bold text-primary hover:underline flex items-center gap-0.5 cursor-pointer"
+                              >
+                                <span className="material-symbols-outlined text-[11px]">edit</span> Editar
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteReview(appt.id)}
+                                className="text-[10px] font-bold text-error hover:underline flex items-center gap-0.5 cursor-pointer"
+                              >
+                                <span className="material-symbols-outlined text-[11px]">delete</span> Eliminar
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <button 
+                            onClick={() => handleOpenReviewModal(appt)}
+                            className="mt-1 bg-secondary text-on-secondary px-3 py-1.5 rounded-xl text-[11px] font-bold hover:bg-secondary-fixed-dim transition-all flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer animate-pulse"
+                          >
+                            <span className="material-symbols-outlined text-[13px]">star</span>
+                            Calificar
+                          </button>
+                        )
+                      )}
                     </div>
                   </div>
                 );
@@ -685,6 +851,110 @@ function CitasContent() {
                   className="px-5 py-2.5 bg-primary hover:bg-primary-container text-on-primary rounded-xl text-sm font-semibold shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50"
                 >
                   Agendar Cita
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Review Modal */}
+      {isReviewModalOpen && selectedApptForReview && (
+        <div className="fixed inset-0 bg-primary/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="glass-card w-full max-w-md p-6 rounded-2xl shadow-xl border border-outline-variant/60 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-bold text-xl text-primary">
+                {userReviews[selectedApptForReview.id] ? 'Editar Calificación' : 'Calificar Servicio'}
+              </h3>
+              <button
+                onClick={() => setIsReviewModalOpen(false)}
+                className="p-1 hover:bg-surface-container-high rounded-full text-on-surface-variant transition-colors"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div className="mb-4 bg-surface-container-low p-4 rounded-xl">
+              <p className="text-xs text-on-surface-variant uppercase font-bold tracking-wider mb-1">Detalles de la Cita</p>
+              <p className="text-sm font-bold text-on-surface">{selectedApptForReview.clinic?.clinic_name || 'Clínica Veterinaria'}</p>
+              <p className="text-xs text-on-surface-variant">Mascota: {selectedApptForReview.pet?.name || 'Mascota'}</p>
+              <p className="text-xs text-on-surface-variant">Fecha: {new Date(selectedApptForReview.appointment_date).toLocaleDateString()}</p>
+            </div>
+
+            <form onSubmit={handleSaveReview} className="space-y-4">
+              <div className="flex flex-col items-center py-2">
+                <label className="block text-sm font-semibold text-on-surface mb-2">¿Cómo calificarías tu experiencia?</label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setReviewRating(star)}
+                      onMouseEnter={() => setReviewHoverRating(star)}
+                      onMouseLeave={() => setReviewHoverRating(0)}
+                      className="p-1 hover:scale-115 transition-transform cursor-pointer"
+                    >
+                      <span
+                        className={`material-symbols-outlined text-[36px] transition-colors ${
+                          star <= (reviewHoverRating || reviewRating) ? 'text-amber-400' : 'text-outline-variant'
+                        }`}
+                        style={{ fontVariationSettings: star <= (reviewHoverRating || reviewRating) ? "'FILL' 1" : undefined }}
+                      >
+                        star
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs font-bold text-amber-500 mt-2 h-4">
+                  {((reviewHoverRating || reviewRating) === 1) && "Muy malo"}
+                  {((reviewHoverRating || reviewRating) === 2) && "Malo"}
+                  {((reviewHoverRating || reviewRating) === 3) && "Regular"}
+                  {((reviewHoverRating || reviewRating) === 4) && "Bueno"}
+                  {((reviewHoverRating || reviewRating) === 5) && "Excelente"}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-on-surface mb-1.5" htmlFor="comment">Comentario (Opcional)</label>
+                <textarea
+                  id="comment"
+                  placeholder="Comparte tu experiencia para ayudar a otros dueños de mascotas..."
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  rows={4}
+                  className="w-full px-4 py-2.5 rounded-lg border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none text-sm text-on-surface resize-none"
+                />
+              </div>
+
+              <div className="flex gap-3 justify-end pt-2">
+                {userReviews[selectedApptForReview.id] && (
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteReview(selectedApptForReview.id)}
+                    className="mr-auto px-4 py-2 border border-error text-error hover:bg-error-container hover:text-on-error-container rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">delete</span>
+                    Eliminar
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setIsReviewModalOpen(false)}
+                  className="px-5 py-2.5 border border-outline-variant hover:bg-surface-container-low rounded-xl text-sm font-semibold transition-all cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingReview}
+                  className="px-5 py-2.5 bg-primary hover:bg-primary-container text-on-primary rounded-xl text-sm font-semibold shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1"
+                >
+                  {savingReview ? (
+                    <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                  ) : (
+                    <span className="material-symbols-outlined text-[16px]">save</span>
+                  )}
+                  {userReviews[selectedApptForReview.id] ? 'Guardar' : 'Calificar'}
                 </button>
               </div>
             </form>

@@ -10,6 +10,8 @@ interface Clinic {
   description: string;
   latitude: number | null;
   longitude: number | null;
+  avgRating?: number;
+  reviewCount?: number;
 }
 
 const DynamicMap = dynamic(() => import('./MapContent'), { 
