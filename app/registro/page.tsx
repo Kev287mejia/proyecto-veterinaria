@@ -100,7 +100,7 @@ export default function Registro() {
               className="w-full px-4 py-3 rounded-lg border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary focus:border-primary transition-colors outline-none text-on-surface" 
               id="name" 
               type="text" 
-              placeholder="Kevin Mejía"
+              placeholder="Carlos Hodgson"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
