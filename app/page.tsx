@@ -195,7 +195,6 @@ export default async function LandingPage() {
           <div className="flex gap-8 text-sm font-medium">
             <Link href="#" className="hover:text-white transition-colors">Términos</Link>
             <Link href="#" className="hover:text-white transition-colors">Privacidad</Link>
-            <Link href="/admin-login" className="hover:text-white transition-colors opacity-60">Portal Admin</Link>
           </div>
         </div>
       </footer>
