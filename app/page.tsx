@@ -1,9 +1,17 @@
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@supabase/supabase-js';
 import Link from 'next/link';
 import Image from 'next/image';
 
+export const revalidate = 3600; // Refrescar la caché cada hora (ISR)
+
 export default async function LandingPage() {
-  const supabase = await createClient();
+  // Usamos un cliente anónimo para evitar leer cookies() y permitir Static Site Generation (SSG)
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  const supabase = createClient(supabaseUrl, supabaseKey, {
+    auth: { persistSession: false }
+  });
+
   const { data: clinics } = await supabase.from('vet_clinics').select('*').limit(10);
 
   return (
