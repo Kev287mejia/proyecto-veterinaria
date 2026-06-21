@@ -113,8 +113,61 @@ export default function Perfil() {
     setSaving(false);
   };
 
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
   const handleEditPhoto = () => {
-    alert('La función de subir fotos de perfil estará disponible próximamente.');
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setSaving(true);
+    setMessage(null);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Usuario no autenticado');
+
+      // Unique file path
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${user.id}-${Date.now()}.${fileExt}`;
+
+      // Upload to 'avatars' bucket
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      // Update profile record
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+
+      // Optimistic UI update
+      setProfile({ ...profile, avatar_url: publicUrl });
+      setMessage({ type: 'success', text: 'Foto de perfil actualizada con éxito.' });
+    } catch (error: any) {
+      console.error('Error uploading photo:', error);
+      setMessage({ type: 'error', text: 'Error al subir la foto. Asegúrate de que el bucket "avatars" exista.' });
+    } finally {
+      setSaving(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
   };
 
   if (loading) {
@@ -141,10 +194,18 @@ export default function Perfil() {
                 {fullName ? fullName.charAt(0).toUpperCase() : 'U'}
               </div>
             )}
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleFileChange} 
+              accept="image/*" 
+              className="hidden" 
+            />
             <button 
               type="button"
               onClick={handleEditPhoto}
-              className="absolute bottom-0 right-0 bg-primary text-on-primary p-2 rounded-full hover:bg-primary-container transition-all shadow-md active:scale-95" 
+              disabled={saving}
+              className="absolute bottom-0 right-0 bg-primary text-on-primary p-2 rounded-full hover:bg-primary-container transition-all shadow-md active:scale-95 disabled:opacity-50" 
               title="Editar foto"
             >
               <span className="material-symbols-outlined text-[18px]">edit</span>
